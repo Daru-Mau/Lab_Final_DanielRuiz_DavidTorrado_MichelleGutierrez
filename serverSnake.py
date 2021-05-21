@@ -1,9 +1,10 @@
 import socket, threading, sys
 
-jugadoresOnline = [[]]
-coloresUsados =[[]]
+jugadoresOnline = []
+areasDisponibles =[[0,0],[310,0],[0,310],[310,310]]
+coloresDisponibles =[[199,0,57],[27,227,106],[245,187,4],[32,229,16]]
 
-class hilo_server(threading.Thread):
+class hilo_server(threading.Thread): #Hilo e instrucciones
     def __init__(self,conexion,dir,jugadores):
         threading.Thread.__init__(self)
         self.conexion = conexion
@@ -28,14 +29,16 @@ class hilo_server(threading.Thread):
             print(self.dir[0]," > ",dt)
             self.transmitir(dt)
 
-class servidor():
+class servidor(): #Crear e Iniciar Servidor
     def iniciar():
         hilos =[]
         server=""
+        """
         socket_server = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         socket_server.connect(("8.8.8.8", 80))
         server = socket_server.getsockname()[0]
         socket_server.close
+        """
         socket_server = socket.socket()
         try:
             socket_server.bind((server,3000))
