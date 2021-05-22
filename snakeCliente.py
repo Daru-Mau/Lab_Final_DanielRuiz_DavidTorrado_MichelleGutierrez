@@ -1,15 +1,16 @@
 import pygame,random,socket,sys,threading
-
+#from snakeMultiplayer.serverSnake import servidor,hilo_server
 from pygame.constants import KEYDOWN, K_BACKSPACE, K_ESCAPE, K_RETURN
 
 pygame.init()
 size = 310,310
 nJugadores=1
 players =0,0
+posInicio=0,0
 screen = pygame.display.set_mode(size)
 fps = pygame.time.Clock()
 pygame.display.set_caption("Snake Online Game")
-font = pygame.font.Font(None,30)
+font = pygame.font.SysFont("comicsansms",20)
 
 def food(): #posicion de la comida
     random_posx = random.randint(10,(size[0]/10)-10)*10
@@ -30,17 +31,18 @@ class hilo_cliente(threading.Thread): #Hilo
             print(recivido)
 
 class cliente(): #Cliente
+    server="" #Direccion en la que se conectara el cliente
     def iniciar():
         server = input("Ingrese ip a conectar")
         try:
             mi_socket = socket.socket()
-            mi_socket.connect(("26.19.70.130",3000))
+            mi_socket.connect((server,3000))
         except: 
             print("No se ha encontrado el servidor")
         hilo = hilo_cliente(mi_socket)
         hilo.start()
         while True:
-            data = input("Escribe: > ")
+            data = "" #Instruccion
             dt = (data.encode())
             mi_socket.send(dt)
 
@@ -117,7 +119,7 @@ def num_jugador(): #Seleccion de jugadores para crear server
             if event.type == pygame.QUIT: pygame.quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_1: 
-                    nJugadores =1                      
+                    nJugadores =1              
                     start = True  
                     players = 310,310
                     screen = pygame.display.set_mode(players)                      
@@ -216,13 +218,16 @@ def Pmenu(): #Pantalla Menu de Inicio
                     start = True                    
                     num_jugador()
 
-def Pespera():
+def Pespera(): #Pantalla de espera
     esperando = True
+    jugadores = nJugadores - 1
     screen.fill((0,0,0))
     while (esperando):
         text = font.render(str("---- Esperando Jugadores ----"),0,(200,60,80))
+        op2 = font.render(str("Jugadores conectas: {}").format(jugadores),0,(200,60,80))
         op2 = font.render(str("Escape para abandonar"),0,(200,60,80))
-        x = size[0]/2-(len(str(text))/2)*(size[0]/((size[0]/10)-6))
+        x = (size[0]/2 - text.get_width() // 2, size[1]/2 - text.get_height() // 2)
+    #size[0]/2-(len(str(text))/2)*(size[0]/((size[0]/10)-6))
         screen.blit(text,(x+5,size[1]/3))
         screen.blit(op2,(x,(size[1]/3)+30)) 
         limites()       
@@ -232,10 +237,7 @@ def Pespera():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:                        
                     esperando = True                    
-                    Pmenu()                   
-                if event.key == pygame.K_c:                        
-                    start = True                    
-                    num_jugador()
+                    Pmenu()
 
 def Pcontinuar(puntaje): #Pantalla de final/Continuar
     global screen
@@ -267,9 +269,10 @@ def Pcontinuar(puntaje): #Pantalla de final/Continuar
                     Pmenu()
 
 class snake(): #Juego 
+    global posInicio
     def start():
         rgb = randomColor() 
-        snake_pos = [100,50]
+        snake_pos = [posInicio[0]+100,posInicio[1]+50]
         snake_body =[[100,50],[90,50],[80,50]]   
         run = True    
         food_pos = food()    
