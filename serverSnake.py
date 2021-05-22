@@ -1,14 +1,15 @@
 import socket, threading, sys
 
 jugadoresOnline = [[]]
-areasDisponibles =[[0,0],[310,0],[0,310],[310,310]]
+zonasDisponibles =[[0,0],[310,0],[0,310],[310,310]]
 coloresDisponibles =[[199,0,57],[27,227,106],[245,187,4],[32,229,16]]
 
 class hilo_server(threading.Thread): #Hilo e instrucciones
-    def __init__(self,conexion,dir,jugadores):
+    def __init__(self,conexion,dir,jugadores,posIni):
         threading.Thread.__init__(self)
         self.conexion = conexion
         self.dir = dir
+        self.posIni = posIni
         self.jugadores = jugadores
 
     def transmitir(self,dt):
@@ -21,14 +22,20 @@ class hilo_server(threading.Thread): #Hilo e instrucciones
 
     def run(self):
         print("\nNueva conexion:",self.dir[0])
+        change =""
         while True:
             dato = self.conexion.recv(2048)
             dt = dato.decode()
-            for jugador in jugadoresOnline():
-                if jugador[1] == self.dir:
-                    print()
             if dt == "":
                 continue
+            if change == "RIGHT":
+                snake_pos[0]+=10
+            if change == "LEFT":
+                snake_pos[0]-=10
+            if change == "UP":
+                snake_pos[1]-=10
+            if change == "DOWN":
+                snake_pos[1]+=10
             print(self.dir[0]," > ",dt)
             self.transmitir(dt)
 
