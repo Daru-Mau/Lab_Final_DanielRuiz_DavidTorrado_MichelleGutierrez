@@ -2,6 +2,7 @@ import socket,threading,pygame
 from pygame.constants import KEYDOWN, K_BACKSPACE, K_ESCAPE, K_RETURN
 import visuals as v
 
+instruccion =""
 
 class Entrada(): #Entrada de texto/datos
     def __init__(self):
@@ -28,7 +29,7 @@ class Entrada(): #Entrada de texto/datos
                     else:
                         self.caracteres[self.linea] = self.caracteres[self.linea][0:-1]
                 elif accion.key == K_ESCAPE:
-                    v.Pmenu()                    
+                    v.num_jugador()                    
                 else:
                     self.caracteres[self.linea]=str(self.caracteres[self.linea]+accion.unicode)
 
@@ -53,11 +54,10 @@ class Entrada(): #Entrada de texto/datos
                     if event.type == pygame.QUIT: pygame.quit()
                     if event.type == pygame.K_RETURN:
                         start = True
-                        #snake.start()
+                        v.num_jugador()
                 ip.teclas(eventos)
                 ip.texto(v.screen,x)
                 pygame.display.flip()
-
 
 class hilo_cliente(threading.Thread): #Hilo
     def __init__(self,socket):
@@ -72,6 +72,7 @@ class hilo_cliente(threading.Thread): #Hilo
             print(recivido)
 
 class cliente(): #Cliente
+    global instruccion 
     server="" #Direccion en la que se conectara el cliente
     def iniciar():
         server = input("Ingrese ip a conectar")
@@ -83,6 +84,5 @@ class cliente(): #Cliente
         hilo = hilo_cliente(mi_socket)
         hilo.start()
         while True:
-            data = "" #Instruccion
-            dt = (data.encode())
+            dt = (instruccion.encode())
             mi_socket.send(dt)

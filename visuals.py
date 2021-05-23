@@ -149,8 +149,11 @@ def Pespera(): #Pantalla de espera
             if event.type == pygame.QUIT: pygame.quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:                        
-                    esperando = True                    
+                    esperando = False                    
                     Pmenu()
+                if event.key == pygame.K_0: 
+                    print("")
+                    snake.start()
 
 def Pcontinuar(puntaje): #Pantalla de final/Continuar
     global screen

@@ -5,12 +5,6 @@ import visuals as v
 
 pygame.init()
 
-def food(): #posicion de la comida
-    random_posx = random.randint(10,(v.size[0]/10)-10)*10
-    random_posy = random.randint(10,(v.size[0]/10)-10)*10    
-    food_pos = [random_posx,random_posy]
-    return food_pos
-
 def colisiones(snake_pos,score): #Detector de colisiones
     if snake_pos[0] <= 0 or snake_pos[0] >= v.size[0]-5:              
         return False,v.Pcontinuar(score)            
@@ -20,12 +14,13 @@ def colisiones(snake_pos,score): #Detector de colisiones
 
 class snake(): #Juego 
     global posInicio
+    
     def start():
         rgb = v.randomColor() 
         snake_pos = [v.posInicio[0]+100,v.posInicio[1]+50]
         snake_body =[[100,50],[90,50],[80,50]]   
         run = True    
-        food_pos = food()    
+        food_pos = v.food()    
         score = 0
         change = "RIGHT"    
         while (run):        
