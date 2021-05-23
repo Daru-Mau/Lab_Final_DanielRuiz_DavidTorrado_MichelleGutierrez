@@ -71,6 +71,10 @@ class hilo_cliente(threading.Thread): #Hilo
                 continue
             print(recivido)
 
+def accion(instruido):
+    global instruccion 
+    instruccion = instruido
+
 class cliente(): #Cliente
     global instruccion 
     server="" #Direccion en la que se conectara el cliente

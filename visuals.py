@@ -165,9 +165,9 @@ def Pcontinuar(puntaje): #Pantalla de final/Continuar
     op3 = font.render(str("Espacio para continuar"),0,(200,60,80))
     x = (size[0]/2 - text.get_width() // 2, size[1]/2 - text.get_height() // 2)
     screen.blit(text,(x[0],size[1]/4))
-    screen.blit(score,(x[0],size[1]/4+30))
-    screen.blit(op2,(x[0],size[1]/4+60))
-    screen.blit(op3,(x[0],(size[1]/4)+90))
+    screen.blit(score,(x[0]-20,size[1]/4+30))
+    screen.blit(op2,(x[0]-20,size[1]/4+60))
+    screen.blit(op3,(x[0]-20,(size[1]/4)+90))
     pygame.display.flip()
     continuar = False
     while not continuar:
