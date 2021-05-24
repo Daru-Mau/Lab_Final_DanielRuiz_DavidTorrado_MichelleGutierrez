@@ -1,13 +1,13 @@
 import pygame,random
-from snakeGame import snake
 from snkCliente import Entrada
-
+from snkCliente import cliente
 
 pygame.init()
 size = 310,310
 nJugadores=1
 players =0,0
 posInicio=0,0
+rgb = 0,0,0
 font = pygame.font.SysFont("comicsansms",20)
 screen = pygame.display.set_mode(size)
 fps = pygame.time.Clock()
@@ -28,7 +28,7 @@ def comer(snake_pos,snake_body,food_pos,score): #Metodo de comer
     return snake_body,score,food_pos
 
 def randomColor(): #Generador del color de la serpiente
-    rgb = [0,0,0]
+    global rgb
     for i in range(3):
         rgb[i] = random.randint(0,255)
     return rgb
@@ -82,30 +82,33 @@ def num_jugador(): #Seleccion de jugadores para crear server
         for event in pygame.event.get():
             if event.type == pygame.QUIT: pygame.quit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_1: 
-                    nJugadores =1              
+                if event.key == pygame.K_1:     
                     start = True  
                     players = 310,310
-                    screen = pygame.display.set_mode(players)                      
-                    snake.start() 
+                    screen = pygame.display.set_mode(players)
+                    c = cliente() 
+                    c.iniciar()    
                 if event.key == pygame.K_2:
                     nJugadores =2   
                     players = 610,310
                     screen = pygame.display.set_mode(players)
-                    start = True    
-                    snake.start()
+                    start = True  
+                    c = cliente() 
+                    c.iniciar()   
                 if event.key == pygame.K_3:  
                     nJugadores =3                         
                     players = 610,610
                     screen = pygame.display.set_mode(players)                 
-                    start = True                        
-                    snake.start() 
+                    start = True   
+                    c = cliente() 
+                    c.iniciar()  
                 if event.key == pygame.K_4: 
                     nJugadores =4   
                     start = True    
                     players = 610,610
                     screen = pygame.display.set_mode(players)
-                    snake.start()
+                    c = cliente() 
+                    c.iniciar()
 
 def Pmenu(): #Pantalla Menu de Inicio
     start = False
@@ -140,7 +143,6 @@ def Pespera(): #Pantalla de espera
         op2 = font.render(str("Jugadores conectas: {}").format(jugadores),0,(200,60,80))
         op2 = font.render(str("Escape para abandonar"),0,(200,60,80))
         x = (size[0]/2 - text.get_width() // 2, size[1]/2 - text.get_height() // 2)
-    #size[0]/2-(len(str(text))/2)*(size[0]/((size[0]/10)-6))
         screen.blit(text,(x+5,size[1]/3))
         screen.blit(op2,(x,(size[1]/3)+30)) 
         limites()       
@@ -151,9 +153,6 @@ def Pespera(): #Pantalla de espera
                 if event.key == pygame.K_ESCAPE:                        
                     esperando = False                    
                     Pmenu()
-                if event.key == pygame.K_0: 
-                    print("")
-                    snake.start()
 
 def Pcontinuar(puntaje): #Pantalla de final/Continuar
     global screen

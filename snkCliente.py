@@ -1,10 +1,20 @@
-import socket,threading,pygame
+import socket,threading,pygame,pickle
 from pygame.constants import KEYDOWN, K_BACKSPACE, K_ESCAPE, K_RETURN
 import visuals as v
+from snakeGame import snake
+
 
 instruccion =""
 
-class Entrada(): #Entrada de texto/datos
+def accion(instruido):
+    global instruccion 
+    instruccion = instruido
+
+def reaccion():
+    global instruccion
+    return instruccion
+
+class Entrada(): #Entrada de texto/datos ------ Faltan Arreglos
     def __init__(self):
         self.ip =""
         self.linea =0
@@ -25,7 +35,7 @@ class Entrada(): #Entrada de texto/datos
                     if self.caracteres[self.linea]=='' and self.linea > 0:
                         self.caracteres == self.caracteres[0:-1]
                         self.linea-=1
-                        print("borrar")
+                        self.texto()
                     else:
                         self.caracteres[self.linea] = self.caracteres[self.linea][0:-1]
                 elif accion.key == K_ESCAPE:
@@ -64,29 +74,29 @@ class hilo_cliente(threading.Thread): #Hilo
         threading.Thread.__init__(self)
         self.socket = socket
     def run(self):
+        global instruccion
         while True:
             data = self.socket.recv(2048)
-            recivido = data.decode()
-            if recivido =="":
+            instruccion = pickle.loads(data)
+            if instruccion =="":
                 continue
-            print(recivido)
-
-def accion(instruido):
-    global instruccion 
-    instruccion = instruido
+            reaccion()
 
 class cliente(): #Cliente
     global instruccion 
-    server="" #Direccion en la que se conectara el cliente
-    def iniciar():
-        server = input("Ingrese ip a conectar")
+    host="localhost" #Direccion en la que se conectara el cliente 
+    def iniciar(self):
+        #host = input("Ingrese ip a conectar")
         try:
             mi_socket = socket.socket()
-            mi_socket.connect((server,3000))
+            mi_socket.connect((self.host,3000))
         except: 
             print("No se ha encontrado el servidor")
         hilo = hilo_cliente(mi_socket)
         hilo.start()
+        while instruccion != "comenzar":
+            v.Pespera
+        snake.start()
         while True:
             dt = (instruccion.encode())
             mi_socket.send(dt)

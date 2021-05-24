@@ -1,17 +1,17 @@
 import pygame,random,sys,pickle
-#from serverSnake import servidor,hilo_server
 from pygame.constants import KEYDOWN, K_BACKSPACE, K_ESCAPE, K_RETURN
 import visuals as v
-from snkCliente import accion
+from snkCliente import accion,reaccion
 
 pygame.init()
+
 movimiento = "RIGHT"
 
 def colisiones(snake_pos,score): #Detector de colisiones
-    if snake_pos[0] <= 0 or snake_pos[0] >= v.size[0]-5:              
-        return False,v.Pcontinuar(score)            
-    if snake_pos[1] <= 0 or snake_pos[1] >= v.size[1]-5:
-        return False,v.Pcontinuar(score)
+    if snake_pos[0] <= v.posInicio[0] or snake_pos[0] >= v.size[0]-10:              
+        return False,v.Pcontinuar(score),accion(score)           
+    if snake_pos[1] <= v.posInicio[1] or snake_pos[1] >= v.size[1]-10:
+        return False,v.Pcontinuar(score),accion(score)
     return True
 
 def instruccion(instruido):
@@ -20,30 +20,24 @@ def instruccion(instruido):
 
 class snake(): #Juego 
     def start():
-        global posInicio
         global movimiento
-        rgb = v.randomColor() 
+        v.posInicio = reaccion() #Recive del server la posicion inicial
+        rgb = reaccion() #Recive del server el color del jugador
         snake_pos = [v.posInicio[0]+100,v.posInicio[1]+50]
-        snake_body =[[100,50],[90,50],[80,50]]   
+        snake_body =[[v.posInicio[0]+100,v.posInicio[1]+50],[v.posInicio[0]+90,v.posInicio[1]+50],[v.posInicio[0]+80,v.posInicio[1]+50]]   
         run = True    
         food_pos = v.food()    
         score = 0
+        accion(movimiento)
         while (run):        
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: pygame.quit()
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RIGHT: movimiento = "RIGHT" 
-                    if event.key == pygame.K_LEFT: movimiento = "LEFT" 
-                    if event.key == pygame.K_UP: movimiento = "UP" 
-                    if event.key == pygame.K_DOWN: movimiento = "DOWN" 
-            if movimiento == "RIGHT":
-                snake_pos[0]+=10
-            if movimiento == "LEFT":
-                snake_pos[0]-=10
-            if movimiento == "UP":
-                snake_pos[1]-=10
-            if movimiento == "DOWN":
-                snake_pos[1]+=10
+                    if event.key == pygame.K_RIGHT: accion("RIGHT")
+                    if event.key == pygame.K_LEFT: accion("LEFT") 
+                    if event.key == pygame.K_UP: accion("UP" )
+                    if event.key == pygame.K_DOWN: accion("DOWN" )
+            snake_pos = reaccion()
             snake_body.insert(0,list(snake_pos))  
             snake_body,score,food_pos = v.comer(snake_pos,snake_body,food_pos,score)  
             v.screen.fill((0,0,0))
