@@ -1,18 +1,10 @@
 import socket,threading,pygame,pickle
 from pygame.constants import KEYDOWN, K_BACKSPACE, K_ESCAPE, K_RETURN
 import visuals as v
-from snakeGame import snake
+import snakeGame as sG
 
-
-instruccion =""
-
-def accion(instruido):
-    global instruccion 
-    instruccion = instruido
-
-def reaccion():
-    global instruccion
-    return instruccion
+def accion_reaccion(instruido):
+    return instruido
 
 class Entrada(): #Entrada de texto/datos ------ Faltan Arreglos
     def __init__(self):
@@ -69,21 +61,24 @@ class Entrada(): #Entrada de texto/datos ------ Faltan Arreglos
                 ip.texto(v.screen,x)
                 pygame.display.flip()
 
-class hilo_cliente(threading.Thread): #Hilo
+class Hilo_cliente(threading.Thread): #Hilo
     def __init__(self,socket):
         threading.Thread.__init__(self)
         self.socket = socket
     def run(self):
-        global instruccion
+        data = self.socket.recv(2048)
+        instruccion = data.decode()
+        while instruccion != "comenzar":
+            v.Pespera()
+        sG.snake.start(self)
         while True:
             data = self.socket.recv(2048)
-            instruccion = pickle.loads(data)
+            instruccion = data.decode()
+            accion_reaccion(instruccion)           
             if instruccion =="":
                 continue
-            reaccion()
 
-class cliente(): #Cliente
-    global instruccion 
+class Cliente(): #Cliente
     host="localhost" #Direccion en la que se conectara el cliente 
     def iniciar(self):
         #host = input("Ingrese ip a conectar")
@@ -92,11 +87,9 @@ class cliente(): #Cliente
             mi_socket.connect((self.host,3000))
         except: 
             print("No se ha encontrado el servidor")
-        hilo = hilo_cliente(mi_socket)
+        hilo = Hilo_cliente(mi_socket)
         hilo.start()
-        while instruccion != "comenzar":
-            v.Pespera
-        snake.start()
-        while True:
-            dt = (instruccion.encode())
-            mi_socket.send(dt)
+
+    def enviar(self,instruccion):
+        dt = instruccion.encode()
+        self.mi_socket.send(dt)

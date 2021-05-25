@@ -1,54 +1,54 @@
 import socket, threading,pickle
 
-jugadoresOnline = [[]]
-zonasDisponibles =[[0,0],[310,0],[0,310],[310,310]]
-coloresDisponibles =[[199,0,57],[27,227,106],[245,187,4],[32,229,16]]
-
-class hilo_server(threading.Thread): #Hilo e instrucciones
-    def __init__(self,conexion,dir,jugadores,posInicial,color):
+class Hilo_Partida(threading.Thread): #Hilo e instrucciones
+    def __init__(self,conexion,dir,cliente):
         threading.Thread.__init__(self)
         self.conexion = conexion
         self.dir = dir
-        self.posIni = posInicial
-        self.color = color
-        self.jugadores = jugadores
+        self.jugadores = cliente.jugadoresOnline
+        self.limite = cliente.esperandoJugadores
+        self.posIni = cliente.zonasDisponibles[len(self.jugadores)-1]
+        self.color = cliente.coloresDisponibles[len(self.jugadores)-1]
+
 
     def transmitir(self,dt):
+        """[summary] Funcion encargada de transmitir una accion a todos los jugadores conectados
+
+        Args:
+            dt ([String]): [description]
+        """
         for jugador in self.jugadores:
             try:            
-                instruccion = "\n"+self.dir[0]+": "+ dt
+                instruccion = dt
                 jugador.send(instruccion.encode())
             except Exception as e:
                 continue
 
     def run(self):
         print("\nNueva conexion:",self.dir[0])
-        if len(jugadoresOnline) ==4:
-            self.transmitir("comenzar".encode())
+        while len(self.jugadores) < self.limite:
+            self.transmitir("nocomenzar")
+        self.transmitir("comenzar")
+        self.transmitir(self.posIni)
+        self.transmitir(self.color)
         while True:
-            snake_pos=0,0 #Temporal
             dato = self.conexion.recv(2048)
             dt = pickle.loads(dato)
             if dt == "":
                 continue
-            if dt == "RIGHT":
-                snake_pos[0]+=10
-            if dt == "LEFT":
-                snake_pos[0]-=10
-            if dt == "UP":
-                snake_pos[1]-=10
-            if dt == "DOWN":
-                snake_pos[1]+=10
             print(self.dir[0],": ",dt)
-            self.transmitir(pickle.dumps(snake_pos))
+            self.transmitir(dt)
 
-class servidor(): #Crear e Iniciar Servidor
-    def asigjugadores(self,numero):
-        self.njugadores = numero
+class Servidor(): #Crear e Iniciar Servidor
+
     def asigIPjugadores(self,ip):
         self.host = ip
 
-    def iniciar():
+    def iniciar(self):
+        self.jugadoresOnline = [[]]
+        self.zonasDisponibles =[[0,0],[310,0],[0,310],[310,310]]
+        self.coloresDisponibles =[[199,0,57],[27,227,106],[245,187,4],[32,229,16]]
+        self.esperandoJugadores = 0
         hilos =[]
         host="localhost" #Direccion con la que se iniciara el server
         """
@@ -66,10 +66,11 @@ class servidor(): #Crear e Iniciar Servidor
         print("\nSocket iniciado:\n Esperando conexiones")
         while True:
             conexion,dir = socket_server.accept()
-            jugadoresOnline.append([conexion,dir])
-            print("\nConexion: ",dir[0])
-            hilo = hilo_server(conexion,dir,jugadoresOnline,zonasDisponibles[len(jugadoresOnline)],coloresDisponibles[0])
+            if self.esperandoJugadores == 0:
+                self.esperandoJugadores = conexion.recv(2048).decode()
+            self.jugadoresOnline.append([conexion,dir])
+            hilo = Hilo_Partida(conexion,dir,self)#jugadoresOnline,self.zonasDisponibles[len(self.jugadoresOnline)],self.coloresDisponibles[len(self.jugadoresOnline)],esperandoJugadores)
             hilo.start()
             hilos.append(hilo)
-
-servidor.iniciar()
+server = Servidor()
+server.iniciar()

@@ -1,6 +1,5 @@
 import pygame,random
-from snkCliente import Entrada
-from snkCliente import cliente
+import snkCliente as sC
 
 pygame.init()
 size = 310,310
@@ -73,11 +72,11 @@ def num_jugador(): #Seleccion de jugadores para crear server
         op3 = font.render(str("3 para un jugador"),0,(200,60,80))
         op4 = font.render(str("4 para un jugador"),0,(200,60,80))
         x = (size[0]/2 - text.get_width() // 2, size[1]/2 - text.get_height() // 2)
-        screen.blit(text,(x[0]+5,size[1]/4))
-        screen.blit(op1,(x[0]+20,(size[1]/4)+30))
-        screen.blit(op2,(x[0]+20,(size[1]/4)+60))
-        screen.blit(op3,(x[0]+20,(size[1]/4)+90))
-        screen.blit(op4,(x[0]+20,(size[1]/4)+120))      
+        screen.blit(text,(x[0]+5,(size[1]/5)))
+        screen.blit(op1,(x[0]+20,(size[1]/5)+30))
+        screen.blit(op2,(x[0]+20,(size[1]/5)+60))
+        screen.blit(op3,(x[0]+20,(size[1]/5)+90))
+        screen.blit(op4,(x[0]+20,(size[1]/5)+120))      
         pygame.display.flip()        
         for event in pygame.event.get():
             if event.type == pygame.QUIT: pygame.quit()
@@ -86,29 +85,34 @@ def num_jugador(): #Seleccion de jugadores para crear server
                     start = True  
                     players = 310,310
                     screen = pygame.display.set_mode(players)
-                    c = cliente() 
-                    c.iniciar()    
+                    c = sC.Cliente() 
+                    c.iniciar() 
+                    c.enviar(nJugadores)   
                 if event.key == pygame.K_2:
                     nJugadores =2   
                     players = 610,310
                     screen = pygame.display.set_mode(players)
                     start = True  
-                    c = cliente() 
-                    c.iniciar()   
+                    c = sC.Cliente() 
+                    c.iniciar()  
+                    c.enviar(nJugadores) 
                 if event.key == pygame.K_3:  
                     nJugadores =3                         
                     players = 610,610
                     screen = pygame.display.set_mode(players)                 
                     start = True   
-                    c = cliente() 
+                    c = sC.Cliente() 
                     c.iniciar()  
+                    c.enviar(nJugadores)
                 if event.key == pygame.K_4: 
                     nJugadores =4   
                     start = True    
                     players = 610,610
                     screen = pygame.display.set_mode(players)
-                    c = cliente() 
+                    c = sC.Cliente()
                     c.iniciar()
+                    c.enviar(nJugadores)
+
 
 def Pmenu(): #Pantalla Menu de Inicio
     start = False
@@ -128,31 +132,29 @@ def Pmenu(): #Pantalla Menu de Inicio
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:                        
                     start = True                    
-                    entrada = Entrada() 
+                    entrada = sC.Entrada() 
                     entrada.unirse()                  
                 if event.key == pygame.K_c:                        
                     start = True                    
                     num_jugador()
 
 def Pespera(): #Pantalla de espera
-    esperando = True
     jugadores = nJugadores - 1
     screen.fill((0,0,0))
-    while (esperando):
-        text = font.render(str("---- Esperando Jugadores ----"),0,(200,60,80))
-        op2 = font.render(str("Jugadores conectas: {}").format(jugadores),0,(200,60,80))
-        op2 = font.render(str("Escape para abandonar"),0,(200,60,80))
-        x = (size[0]/2 - text.get_width() // 2, size[1]/2 - text.get_height() // 2)
-        screen.blit(text,(x+5,size[1]/3))
-        screen.blit(op2,(x,(size[1]/3)+30)) 
-        limites()       
-        pygame.display.flip()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT: pygame.quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:                        
-                    esperando = False                    
-                    Pmenu()
+    text = font.render(str("---- Esperando Jugadores ----"),0,(200,60,80))
+    op2 = font.render(str("Jugadores conectados: {}").format(jugadores),0,(200,60,80))
+    op2 = font.render(str("Escape para abandonar"),0,(200,60,80))
+    x = (size[0]/2 - text.get_width()/2, size[1]/2 - text.get_height()/2)
+    screen.blit(text,(x[0]+5,size[1]/3))
+    screen.blit(op2,(x[0],(size[1]/3)+30)) 
+    limites()       
+    pygame.display.flip()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: pygame.quit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:                 
+                Pmenu()
+
 
 def Pcontinuar(puntaje): #Pantalla de final/Continuar
     global screen
