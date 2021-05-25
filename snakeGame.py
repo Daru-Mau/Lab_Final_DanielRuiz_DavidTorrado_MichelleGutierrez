@@ -5,8 +5,6 @@ import snkCliente as sC
 
 pygame.init()
 
-
-
 def colisiones(snake_pos,score): #Detector de colisiones
     if snake_pos[0] <= v.posInicio[0] or snake_pos[0] >= v.size[0]-10:              
         return False,v.Pcontinuar(score),sC.accion(score)           
@@ -14,11 +12,16 @@ def colisiones(snake_pos,score): #Detector de colisiones
         return False,v.Pcontinuar(score),sC.accion(score)
     return True
 
+def realizar(instruido):
+    return instruido 
+
 class Snake(): #Juego 
     def start(cliente):
+        print("El juego comenzo")
         movimiento = "RIGHT"
-        v.posInicio = sC.accion_reaccion() #Recive del server la posicion inicial
-        rgb = sC.accion_reaccion() #Recive del server el color del jugador
+        v.posInicio,v.rgb = realizar(sC.devolver()) #Recive del server la posicion inicial y Recive del server el color del jugador
+        print("posicion inicial serpiente: ", v.posInicio)
+        print("color serpiente: ",v.rgb)
         snake_pos = [v.posInicio[0]+100,v.posInicio[1]+50]
         snake_body =[[v.posInicio[0]+100,v.posInicio[1]+50],[v.posInicio[0]+90,v.posInicio[1]+50],[v.posInicio[0]+80,v.posInicio[1]+50]]   
         run = True    
@@ -33,7 +36,7 @@ class Snake(): #Juego
                     if event.key == pygame.K_LEFT: cliente.enviar("LEFT") 
                     if event.key == pygame.K_UP: cliente.enviar("UP" )
                     if event.key == pygame.K_DOWN: cliente.enviar("DOWN")
-            intruccion = cliente.accion_reaccion()
+            intruccion = realizar(sC.devolver())
             if intruccion == "RIGHT":
                 snake_pos[0]+=10
             if intruccion == "LEFT":

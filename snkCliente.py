@@ -3,8 +3,15 @@ from pygame.constants import KEYDOWN, K_BACKSPACE, K_ESCAPE, K_RETURN
 import visuals as v
 import snakeGame as sG
 
-def accion_reaccion(instruido):
-    return instruido
+comando=""
+
+def accion_reaccion(instruccion):
+    global comando
+    comando= instruccion
+
+def devolver():
+    global comando
+    return comando
 
 class Entrada(): #Entrada de texto/datos ------ Faltan Arreglos
     def __init__(self):
@@ -69,27 +76,34 @@ class Hilo_cliente(threading.Thread): #Hilo
         data = self.socket.recv(2048)
         instruccion = data.decode()
         while instruccion != "comenzar":
-            v.Pespera()
+            v.Pespera(instruccion)
         sG.snake.start(self)
+        data = self.socket.recv(2048)
+        instruccion = pickle.loads(data)
+        accion_reaccion(instruccion)
         while True:
-            data = self.socket.recv(2048)
-            instruccion = data.decode()
-            accion_reaccion(instruccion)           
-            if instruccion =="":
-                continue
+            try:
+                self.socket.send("RIGHT".encode())
+                data = self.socket.recv(2048)
+                instruccion = data.decode()
+                accion_reaccion(instruccion)        
+                if instruccion =="":
+                    continue
+            except Exception as e:
+                print()
 
 class Cliente(): #Cliente
     host="localhost" #Direccion en la que se conectara el cliente 
     def iniciar(self):
         #host = input("Ingrese ip a conectar")
         try:
-            mi_socket = socket.socket()
-            mi_socket.connect((self.host,3000))
+            self.mi_socket = socket.socket()
+            self.mi_socket.connect((self.host,3000))
         except: 
             print("No se ha encontrado el servidor")
-        hilo = Hilo_cliente(mi_socket)
+        hilo = Hilo_cliente(self.mi_socket)
         hilo.start()
 
     def enviar(self,instruccion):
-        dt = instruccion.encode()
+        dt = str(instruccion).encode()
         self.mi_socket.send(dt)

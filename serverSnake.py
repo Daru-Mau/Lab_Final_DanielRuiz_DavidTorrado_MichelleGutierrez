@@ -8,7 +8,9 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
         self.jugadores = cliente.jugadoresOnline
         self.limite = cliente.esperandoJugadores
         self.posIni = cliente.zonasDisponibles[len(self.jugadores)-1]
+        print(self.posIni)
         self.color = cliente.coloresDisponibles[len(self.jugadores)-1]
+        print(self.color)
 
 
     def transmitir(self,dt):
@@ -27,13 +29,13 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
     def run(self):
         print("\nNueva conexion:",self.dir[0])
         while len(self.jugadores) < self.limite:
-            self.transmitir("nocomenzar")
+            self.transmitir(str(self.jugadores))
         self.transmitir("comenzar")
-        self.transmitir(self.posIni)
-        self.transmitir(self.color)
+        print("El juego puede comenzar")
+        self.transmitir(pickle.dumps([self.posIni,self.color]))
         while True:
             dato = self.conexion.recv(2048)
-            dt = pickle.loads(dato)
+            dt = dato.decode()
             if dt == "":
                 continue
             print(self.dir[0],": ",dt)
@@ -45,7 +47,7 @@ class Servidor(): #Crear e Iniciar Servidor
         self.host = ip
 
     def iniciar(self):
-        self.jugadoresOnline = [[]]
+        self.jugadoresOnline = []
         self.zonasDisponibles =[[0,0],[310,0],[0,310],[310,310]]
         self.coloresDisponibles =[[199,0,57],[27,227,106],[245,187,4],[32,229,16]]
         self.esperandoJugadores = 0
@@ -67,7 +69,8 @@ class Servidor(): #Crear e Iniciar Servidor
         while True:
             conexion,dir = socket_server.accept()
             if self.esperandoJugadores == 0:
-                self.esperandoJugadores = conexion.recv(2048).decode()
+                self.esperandoJugadores = int(conexion.recv(2048).decode())
+                print("numero de jugadores a esperar: ", self.esperandoJugadores)
             self.jugadoresOnline.append([conexion,dir])
             hilo = Hilo_Partida(conexion,dir,self)#jugadoresOnline,self.zonasDisponibles[len(self.jugadoresOnline)],self.coloresDisponibles[len(self.jugadoresOnline)],esperandoJugadores)
             hilo.start()

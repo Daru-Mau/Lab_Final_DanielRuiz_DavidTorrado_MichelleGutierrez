@@ -138,8 +138,8 @@ def Pmenu(): #Pantalla Menu de Inicio
                     start = True                    
                     num_jugador()
 
-def Pespera(): #Pantalla de espera
-    jugadores = nJugadores - 1
+def Pespera(texto): #Pantalla de espera
+    jugadores = texto
     screen.fill((0,0,0))
     text = font.render(str("---- Esperando Jugadores ----"),0,(200,60,80))
     op2 = font.render(str("Jugadores conectados: {}").format(jugadores),0,(200,60,80))
@@ -154,7 +154,6 @@ def Pespera(): #Pantalla de espera
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:                 
                 Pmenu()
-
 
 def Pcontinuar(puntaje): #Pantalla de final/Continuar
     global screen
