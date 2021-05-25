@@ -34,12 +34,15 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
         print("El juego puede comenzar")
         self.transmitir(pickle.dumps([self.posIni,self.color]))
         while True:
-            dato = self.conexion.recv(2048)
-            dt = dato.decode()
-            if dt == "":
+            try:
+                dato = self.conexion.recv(2048)
+                dt = dato.decode()
+                if dt == "":
+                    continue
+                print(self.dir[0],": ",dt)
+                self.transmitir(dt)
+            except Exception as e:
                 continue
-            print(self.dir[0],": ",dt)
-            self.transmitir(dt)
 
 class Servidor(): #Crear e Iniciar Servidor
 
@@ -72,7 +75,7 @@ class Servidor(): #Crear e Iniciar Servidor
                 self.esperandoJugadores = int(conexion.recv(2048).decode())
                 print("numero de jugadores a esperar: ", self.esperandoJugadores)
             self.jugadoresOnline.append([conexion,dir])
-            hilo = Hilo_Partida(conexion,dir,self)#jugadoresOnline,self.zonasDisponibles[len(self.jugadoresOnline)],self.coloresDisponibles[len(self.jugadoresOnline)],esperandoJugadores)
+            hilo = Hilo_Partida(conexion,dir,self)
             hilo.start()
             hilos.append(hilo)
 server = Servidor()

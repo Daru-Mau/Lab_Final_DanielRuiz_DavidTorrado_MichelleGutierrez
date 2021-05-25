@@ -90,7 +90,7 @@ class Hilo_cliente(threading.Thread): #Hilo
                 if instruccion =="":
                     continue
             except Exception as e:
-                print()
+                continue
 
 class Cliente(): #Cliente
     host="localhost" #Direccion en la que se conectara el cliente 
