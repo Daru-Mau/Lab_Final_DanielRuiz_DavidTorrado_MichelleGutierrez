@@ -10,20 +10,31 @@ rgb = 0,0,0
 font = pygame.font.SysFont("comicsansms",20)
 screen = pygame.display.set_mode(size)
 fps = pygame.time.Clock()
+food_pos =[]
 pygame.display.set_caption("Snake Online Game")
 
-def food(): #posicion de la comida
-    random_posx = random.randint(10,(size[0]/10)-10)*10
-    random_posy = random.randint(10,(size[0]/10)-10)*10    
-    food_pos = [random_posx,random_posy]
+def puntos(): #posicion de la comida
+    global food_pos
+    if len(food_pos) == 0:
+        for x in range(1):
+            random_posx = random.randint(10,(size[0]/10)-10)*10
+            random_posy = random.randint(10,(size[0]/10)-10)*10    
+            food_pos.append([random_posx,random_posy])
+    if len(food_pos)<1:
+        while len(food_pos)<10:
+            random_posx = random.randint(10,(size[0]/10)-10)*10
+            random_posy = random.randint(10,(size[0]/10)-10)*10    
+            food_pos.append([random_posx,random_posy])
     return food_pos
 
 def comer(snake_pos,snake_body,food_pos,score): #Metodo de comer
-    if snake_pos == food_pos: 
-        food_pos = food()
-        score +=1   
-    else:
-        snake_body.pop()     
+    for food in food_pos:
+        if snake_pos == food:
+            food_pos.remove(food)
+            food_pos = puntos()
+            score +=1
+            return snake_body,score,food_pos
+    snake_body.pop()            
     return snake_body,score,food_pos
 
 def randomColor(): #Generador del color de la serpiente

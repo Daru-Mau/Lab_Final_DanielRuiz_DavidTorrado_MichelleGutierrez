@@ -5,11 +5,14 @@ import snkCliente as sC
 
 pygame.init()
 
-def colisiones(snake_pos,score): #Detector de colisiones
+def colisiones(snake_pos,snake_body,score): #Detector de colisiones
     if snake_pos[0] <= v.posInicio[0] or snake_pos[0] >= v.size[0]-10:              
         return False,v.Pcontinuar(score),sC.accion(score)           
     if snake_pos[1] <= v.posInicio[1] or snake_pos[1] >= v.size[1]-10:
         return False,v.Pcontinuar(score),sC.accion(score)
+    for i in range(1,len(snake_body)):
+        if snake_body[i] == snake_pos:   
+            return False,v.Pcontinuar(score)
     return True
 
 def realizar(instruido):
@@ -32,10 +35,22 @@ class Snake(): #Juego
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: pygame.quit()
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RIGHT: cliente.enviar("RIGHT")
-                    if event.key == pygame.K_LEFT: cliente.enviar("LEFT") 
-                    if event.key == pygame.K_UP: cliente.enviar("UP" )
-                    if event.key == pygame.K_DOWN: cliente.enviar("DOWN")
+                    if movimiento != "LEFT":
+                        if event.key == pygame.K_RIGHT:  
+                            cliente.enviar("RIGHT")
+                            movimiento = "RIGHT"
+                    if movimiento != "RIGHT": 
+                        if event.key == pygame.K_LEFT: 
+                            cliente.enviar("LEFT") 
+                            movimiento = "LEFT"
+                    if movimiento != "DOWN":
+                            if event.key == pygame.K_UP:  
+                                cliente.enviar("UP")
+                                movimiento = "UP"
+                    if movimiento != "UP":
+                        if event.key == pygame.K_DOWN:  
+                            cliente.enviar("DOWN")
+                            movimiento = "DOWN"
             intruccion = realizar(sC.devolver())
             if intruccion == "RIGHT":
                 snake_pos[0]+=10
@@ -50,15 +65,15 @@ class Snake(): #Juego
             v.screen.fill((0,0,0))
             v.limites() 
             for pos in snake_body:
-                pygame.draw.rect(v.screen,(rgb[0],rgb[1],rgb[2]),pygame.Rect(pos[0],pos[1],10,10))
-            pygame.draw.rect(v.screen,(rgb[0],rgb[1],rgb[2]),pygame.Rect(food_pos[0],food_pos[1],10,10))
+                pygame.draw.rect(v.screen,(v.rgb[0],v.rgb[1],v.rgb[2]),pygame.Rect(pos[0],pos[1],10,10))
+            pygame.draw.rect(v.screen,(v.rgb[0],v.rgb[1],v.rgb[2]),pygame.Rect(food_pos[0],food_pos[1],10,10))
             text = v.font.render(str(score),0,(200,60,80))
             v.screen.blit(text,(v.size[0]-30,20))
             if score < 5:
                 v.fps.tick(10)
             elif score < 50:
                 v.fps.tick(score+5)
-            run = colisiones(snake_pos,score)               
+            run = colisiones(snake_pos,snake_body,score)               
             pygame.display.flip()
 
 
