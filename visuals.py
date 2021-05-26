@@ -18,13 +18,13 @@ def puntos(): #posicion de la comida
     global food_pos
     if len(food_pos) == 0:
         for x in range(cantidad):
-            random_posx = random.randint(10,(size[0]/10)-10)*10
-            random_posy = random.randint(10,(size[0]/10)-10)*10    
+            random_posx = random.randint(posInicio[0]+10,(posInicio[0]+size[0]/10)-10)*10
+            random_posy = random.randint(posInicio[1]+10,(posInicio[1]+size[1]/10)-10)*10    
             food_pos.append([random_posx,random_posy])
     if len(food_pos)<cantidad:
         while len(food_pos)<10:
-            random_posx = random.randint(10,(size[0]/10)-10)*10
-            random_posy = random.randint(10,(size[0]/10)-10)*10    
+            random_posx = random.randint(posInicio[0]+10,(posInicio[0]+size[0]/10)-10)*10
+            random_posy = random.randint(posInicio[1]+10,(posInicio[1]+size[1]/10)-10)*10      
             food_pos.append([random_posx,random_posy])
     return food_pos
 
@@ -81,9 +81,9 @@ def num_jugador(): #Seleccion de jugadores para crear server
     while (not start):
         text = font.render(str("--- Cantidad de Jugadores: ---"),0,(200,60,80))
         op1 = font.render(str("1 para un jugador"),0,(200,60,80))
-        op2 = font.render(str("2 para un jugador"),0,(200,60,80))
-        op3 = font.render(str("3 para un jugador"),0,(200,60,80))
-        op4 = font.render(str("4 para un jugador"),0,(200,60,80))
+        op2 = font.render(str("2 para dos jugadores"),0,(200,60,80))
+        op3 = font.render(str("3 para tres jugadores"),0,(200,60,80))
+        op4 = font.render(str("4 para cuatro jugadores"),0,(200,60,80))
         x = (size[0]/2 - text.get_width() // 2, size[1]/2 - text.get_height() // 2)
         screen.blit(text,(x[0]+5,(size[1]/5)))
         screen.blit(op1,(x[0]+20,(size[1]/5)+30))
@@ -131,12 +131,12 @@ def Pmenu(): #Pantalla Menu de Inicio
     screen.fill((0,0,0))
     while (not start):
         text = font.render(str("---- Custom Snake Game: ----"),0,(200,60,80))
-        op1 = font.render(str("C para crear a partida"),0,(200,60,80))
-        op2 = font.render(str("Espacio para unirse a partida"),0,(200,60,80))
+        op1 = font.render(str("C para iniciar una partida"),0,(200,60,80))
+        #op2 = font.render(str("Espacio para unirse a partida"),0,(200,60,80))
         x = (size[0]/2 - text.get_width() // 2, size[1]/2 - text.get_height() // 2)
         screen.blit(text,(x[0]+5,size[1]/3))
         screen.blit(op1,(x[0],(size[1]/3)+60))
-        screen.blit(op2,(x[0],(size[1]/3)+30)) 
+        #screen.blit(op2,(x[0],(size[1]/3)+30)) 
         limites()       
         pygame.display.flip()
         for event in pygame.event.get():
@@ -155,7 +155,7 @@ def Pespera(texto,cliente): #Pantalla de espera
     jugadores = texto
     screen.fill((0,0,0))
     text = font.render(str("---- Esperando Jugadores ----"),0,(200,60,80))
-    op1 = font.render(str("Jugadores faltantes: {}").format(jugadores),0,(200,60,80))
+    op1 = font.render(str(f"Jugadores faltantes: {jugadores}"),0,(200,60,80))
     op2 = font.render(str("Escape para abandonar"),0,(200,60,80))
     x = (size[0]/2 - text.get_width()/2, size[1]/2 - text.get_height()/2)
     screen.blit(text,(posInicio[0]+x[0]+5,posInicio[1]+size[1]/3))
@@ -173,7 +173,7 @@ def Pespera(texto,cliente): #Pantalla de espera
                 pygame.display.set_mode(size)             
                 Pmenu()
 
-def PcontinuarP(puntaje): #Pantalla de final/Continuar
+def PcontinuarP(puntaje,cliente): #Pantalla de final/Continuar
     global screen
     screen.fill((0,0,0))
     limites()
@@ -196,6 +196,9 @@ def PcontinuarP(puntaje): #Pantalla de final/Continuar
                     continuar=True
                     screen.fill((0,0,0))
                     players = size
+                    cliente.enviar("salir")
+                    print("cliente fuera")
+                    cliente.mi_socket.close()
                     screen = pygame.display.set_mode(players)
                     Pmenu()
                 if event.key == pygame.K_r:
@@ -203,9 +206,9 @@ def PcontinuarP(puntaje): #Pantalla de final/Continuar
                     screen.fill((0,0,0))
                     players = size
                     screen = pygame.display.set_mode(players)
-                    Pmenu()
+                    Pespera("nombre",cliente)
 
-def PcontinuarG(puntaje): #Pantalla de final/Continuar
+def PcontinuarG(puntaje,cliente): #Pantalla de final/Continuar
     global screen
     screen.fill((0,0,0))
     limites()
@@ -228,9 +231,12 @@ def PcontinuarG(puntaje): #Pantalla de final/Continuar
                     continuar=True
                     screen.fill((0,0,0))
                     players = size
+                    cliente.enviar("salir")
+                    print("cliente fuera")
+                    cliente.mi_socket.close()
                     screen = pygame.display.set_mode(players)
                     Pmenu()
                 if event.key == pygame.K_r:
                     continuar=True
                     screen.fill((0,0,0))
-                    Pmenu()
+                    Pespera("nombre",cliente)

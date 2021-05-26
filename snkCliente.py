@@ -91,11 +91,13 @@ class Hilo_cliente(threading.Thread): #Hilo
                 if instruccion !="":
                     if "ganador" in instruccion:
                         self.terminar = True
+                        if str(self.cliente.id) in instruccion:
+                            accion_reaccion(f"ganaste{instruccion[-1:]}")
+                        else:
+                            accion_reaccion(f"perdiste{instruccion[-1:]}")
                     else:
                         if str(self.cliente.id) in instruccion:                    
-                            accion_reaccion(instruccion[1:]) 
-                        else:
-                            print()                 
+                            accion_reaccion(instruccion[1:])                
         except Exception as e:
             print()
 
@@ -111,16 +113,25 @@ class Cliente(): #Cliente
 
     def iniciar(self):
         #host = input("Ingrese ip a conectar")
-        
         hilo = Hilo_cliente(self.mi_socket,self)
         hilo.start()
         while not hilo.comenzar:
             v.Pespera(devolver(),self)
         sG.Snake.start(self)
+        while not hilo.terminar:
+            v.Pespera(devolver(),self)
+        if "ganaste" in devolver():
+            v.PcontinuarG(devolver()[-1:],self)
+        else:
+            v.PcontinuarP(devolver()[-1:],self)
+
     def enviar(self,instruccion):
         if "score" in str(instruccion):
-            dt = str(f"{self.id}{instruccion}").encode()
+            dt = instruccion.encode()
             self.mi_socket.send(dt)
+        #elif "jugador" in instruccion[0]:
+            #self.mi_socket.send("posicion".encode())
+            #self.mi_socket.send(pickle.dumps([f"j{self.id}",instruccion[1],instruccion[2]]))
         else:
             dt = str(instruccion).encode()
             self.mi_socket.send(dt)

@@ -1,21 +1,18 @@
-import pygame
+import pygame,pickle
 from pygame.constants import KEYDOWN, K_BACKSPACE, K_ESCAPE, K_RETURN
 import visuals as v
 import snkCliente as sC
 
 pygame.init()
 
-def colisiones(snake_pos,snake_body,score): #Detector de colisiones
+def colisiones(snake_pos,snake_body,c,score): #Detector de colisiones
     if snake_pos[0] <= v.posInicio[0]+10 or snake_pos[0] >= v.posInicio[0]+300:
-        print("boom1")             
-        return False,v.PcontinuarP(score),sC.accion(score),sC.c.close()          
-    if snake_pos[1] <= v.posInicio[1]+10 or snake_pos[1] >= v.posInicio[1]+300:
-        print("boom2")  
-        return False,v.PcontinuarP(score),sC.accion(score),sC.c.close()
-    #for i in range(1,len(snake_body)):
+        return False     
+    if snake_pos[1] <= v.posInicio[1]+10 or snake_pos[1] >= v.posInicio[1]+300:    
+        return False
+    #for i in range(2,len(snake_body)):
         if snake_body[i] == snake_pos:
-            print("boom3")  
-            return False,v.PcontinuarP(score),sC.c.close()
+            return False
     return True
 
 def recibir(instruido):
@@ -31,7 +28,7 @@ class Snake(): #Juego
         score = 0
         instruccion = "RIGHT"
         cliente.enviar(instruccion)
-        while (run):        
+        while run:        
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: pygame.quit()
                 if event.type == pygame.KEYDOWN:
@@ -60,8 +57,9 @@ class Snake(): #Juego
             if instruccion == "UP":
                 snake_pos[1]-=10
             if instruccion == "DOWN":
-                snake_pos[1]+=10
-            snake_body.insert(0,list(snake_pos))  
+                snake_pos[1]+=10            
+            snake_body.insert(0,list(snake_pos)) 
+            #cliente.enviar("jugador",snake_body,food_pos) #Enviar posicion del jugador y sus puntos
             snake_body,score,food_pos = v.comer(snake_pos,snake_body,food_pos,score)  
             v.screen.fill((0,0,0))
             v.limites() 
@@ -70,15 +68,15 @@ class Snake(): #Juego
             for food in food_pos:
                 pygame.draw.rect(v.screen,(v.rgb[0],v.rgb[1],v.rgb[2]),pygame.Rect(food[0],food[1],10,10))
             text = v.font.render(str(score),0,(200,60,80))
-            v.screen.blit(text,(v.size[0]-30,20))
+            v.screen.blit(text,(v.posInicio[0]+v.size[0]-30,v.posInicio[1]+20))
             if score < 5:
                 v.fps.tick(10)
             elif score < 50:
                 v.fps.tick(score+5)
-            run = colisiones(snake_pos,snake_body,score)               
-            pygame.display.flip()
-        print(f"score{score}")
-        cliente.enviar(f"score{score}")
+            run = colisiones(snake_pos,snake_body,cliente,score)               
+            pygame.display.flip() 
+        cliente.enviar(f"score{score}") 
+              
 
 
 

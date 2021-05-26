@@ -23,24 +23,23 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
         Args:
             dt ([String]): [description]
         """
+        print(self.id,dt)
         global jugadoresOnline
         for jugador in jugadoresOnline:
-            try:      
-                print(dt)      
-                jugador[0].send(f"{self.id}{dt}".encode())
+            try: 
+                jugador.send(f"{self.id}{dt}".encode())
             except Exception as e:
                 continue
 
     def run(self):
         """[summary]
         """
-        global jugadoresOnline,puntajes
+        global jugadoresOnline,puntajes,aceptando
         print("\nNueva conexion:",self.dir[0]) 
         if len(jugadoresOnline) < self.limite:
             self.transmitir(str(self.limite-len(jugadoresOnline)))
         elif len(jugadoresOnline) == self.limite:
-            self.transmitir("comenzar")  
-            print("El juego puede comenzar")                  
+            self.transmitir("comenzar")               
             while True:
                 try:
                     dato = self.conexion.recv(2048)
@@ -48,9 +47,17 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
                     if(dt != ""):
                         if "score" in dt:
                             puntajes.append(dt)
-                            if len(puntajes)==self.limite:
+                            if len(puntajes)==len(jugadoresOnline):
                                 puntajes.sort()
-                                self.transmitir(puntajes[0])
+                                self.transmitir(f"ganador{puntajes[0]}")
+                        #elif "posicion" in dt:
+                            #dato = self.conexion.recv(2048)
+                            #datos = pickle.loads(dato)
+                        elif dt == "salir":
+                            jugadoresOnline.remove(self.conexion)                            
+                            self.conexion.close()
+                            aceptando = True
+                            print("se ha desconectado")
                         else:
                             self.transmitir(dt)
                     else:
@@ -60,6 +67,7 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
 
 jugadoresOnline = []
 puntajes =[]
+aceptando = True
 
 class Servidor(): #Crear e Iniciar Servidor
     def asigIPjugadores(self,ip):
@@ -83,18 +91,23 @@ class Servidor(): #Crear e Iniciar Servidor
         except socket.error as e:
             str(e)
         socket_server.listen(4)
-        print("\nSocket iniciado:\n Esperando conexiones")
-        aceptando = True
+        print("\nSocket iniciado:\n Esperando jugadores")
+        global aceptando
         while True:
             try:
                 conexion,dir = socket_server.accept()
-                if self.esperandoJugadores == 0:
-                    self.esperandoJugadores = int(conexion.recv(2048).decode())
-                    print("numero de jugadores a esperar: ", self.esperandoJugadores)
-                jugadoresOnline.append([conexion,dir])
-                hilo = Hilo_Partida(conexion,dir,self)
-                hilo.start()
-                hilos.append(hilo)
+                if aceptando == False:
+                    conexion.send("Server Lleno".encode)
+                    conexion.close()
+                else:
+                    if len(jugadoresOnline) == 0:
+                        self.esperandoJugadores = int(conexion.recv(2048).decode())
+                    jugadoresOnline.append(conexion)
+                    if len(jugadoresOnline)==self.esperandoJugadores:
+                        aceptando = False
+                    hilo = Hilo_Partida(conexion,dir,self)
+                    hilo.start()
+                    hilos.append(hilo)
             except Exception as e:
                 print(e)
 server = Servidor()
