@@ -124,7 +124,6 @@ def num_jugador(): #Seleccion de jugadores para crear server
                     c.iniciar()
                     c.enviar(nJugadores)
 
-
 def Pmenu(): #Pantalla Menu de Inicio
     start = False
     screen.fill((0,0,0))

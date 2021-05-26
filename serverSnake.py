@@ -30,8 +30,8 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
         print("\nNueva conexion:",self.dir[0])
         while len(self.jugadores) < self.limite:
             self.transmitir(str(self.jugadores))
-        self.transmitir("comenzar")
         print("El juego puede comenzar")
+        self.transmitir("comenzar")        
         self.transmitir(pickle.dumps([self.posIni,self.color]))
         while True:
             try:
@@ -69,14 +69,19 @@ class Servidor(): #Crear e Iniciar Servidor
             str(e)
         socket_server.listen(4)
         print("\nSocket iniciado:\n Esperando conexiones")
-        while True:
-            conexion,dir = socket_server.accept()
-            if self.esperandoJugadores == 0:
-                self.esperandoJugadores = int(conexion.recv(2048).decode())
-                print("numero de jugadores a esperar: ", self.esperandoJugadores)
-            self.jugadoresOnline.append([conexion,dir])
-            hilo = Hilo_Partida(conexion,dir,self)
-            hilo.start()
-            hilos.append(hilo)
+        aceptando = True
+        while aceptando:
+            if len(self.jugadoresOnline) == 0 or len(self.jugadoresOnline) < self.esperandoJugadores:
+                conexion,dir = socket_server.accept()
+                if self.esperandoJugadores == 0:
+                    self.esperandoJugadores = int(conexion.recv(2048).decode())
+                    print("numero de jugadores a esperar: ", self.esperandoJugadores)
+                self.jugadoresOnline.append([conexion,dir])
+                hilo = Hilo_Partida(conexion,dir,self)
+                hilo.start()
+                hilos.append(hilo)
+            else:
+                aceptando = False
+                print("Conexion rechazada.\n Server Lleno")
 server = Servidor()
 server.iniciar()

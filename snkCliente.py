@@ -83,7 +83,6 @@ class Hilo_cliente(threading.Thread): #Hilo
         accion_reaccion(instruccion)
         while True:
             try:
-                self.socket.send("RIGHT".encode())
                 data = self.socket.recv(2048)
                 instruccion = data.decode()
                 accion_reaccion(instruccion)        
