@@ -9,54 +9,58 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
             cliente ([type]): [description]
         """
         threading.Thread.__init__(self)
-        self.conexion = conexion
+        self.conexion = conexion        
         self.dir = dir
-        self.jugadores = cliente.jugadoresOnline
+        self.jugadores = jugadoresOnline
+        self.id = len(self.jugadores)
         self.limite = cliente.esperandoJugadores
         self.posIni = cliente.zonasDisponibles[len(self.jugadores)-1]
-        print(self.posIni)
         self.color = cliente.coloresDisponibles[len(self.jugadores)-1]
-        print(self.color)
-
+        self.conexion.send(pickle.dumps([self.posIni,self.color,self.id]))
 
     def transmitir(self,dt):
         """[summary] Funcion encargada de transmitir una accion a todos los jugadores conectados
         Args:
             dt ([String]): [description]
         """
-        for jugador in self.jugadores:
+        global jugadoresOnline
+        for jugador in jugadoresOnline:
             try:      
                 print(dt)      
-                jugador.send(dt.encode())
+                jugador[0].send(f"{self.id}{dt}".encode())
             except Exception as e:
                 continue
 
     def run(self):
         """[summary]
         """
+        global jugadoresOnline
         print("\nNueva conexion:",self.dir[0])
-        if len(self.jugadores) < self.limite:
+        if len(jugadoresOnline) < self.limite:
             self.transmitir(str(len(self.jugadores)))
-        else:
+        elif len(jugadoresOnline) == self.limite:
             self.transmitir("comenzar")  
             print("El juego puede comenzar")                  
-            self.conexion.send(pickle.dumps([self.posIni,self.color]))
             while True:
                 try:
                     dato = self.conexion.recv(2048)
                     dt = dato.decode()
-                    if dt == "":
-                        continue
+                    print(dt)
+                    if dt != "":
+                        self.transmitir(dt)
+                    else:
+                        self.transmitir("")
                     print(self.dir[0],": ",dt)
-                    self.transmitir(dt)
                 except Exception as e:
                     continue
+
+jugadoresOnline = []
 
 class Servidor(): #Crear e Iniciar Servidor
     def asigIPjugadores(self,ip):
         self.host = ip
     def iniciar(self):
-        self.jugadoresOnline = []
+        global jugadoresOnline
         self.zonasDisponibles =[[0,0],[310,0],[0,310],[310,310]]
         self.coloresDisponibles =[[199,0,57],[27,227,106],[245,187,4],[32,229,16]]
         self.esperandoJugadores = 0
@@ -82,7 +86,7 @@ class Servidor(): #Crear e Iniciar Servidor
                 if self.esperandoJugadores == 0:
                     self.esperandoJugadores = int(conexion.recv(2048).decode())
                     print("numero de jugadores a esperar: ", self.esperandoJugadores)
-                self.jugadoresOnline.append([conexion,dir])
+                jugadoresOnline.append([conexion,dir])
                 hilo = Hilo_Partida(conexion,dir,self)
                 hilo.start()
                 hilos.append(hilo)

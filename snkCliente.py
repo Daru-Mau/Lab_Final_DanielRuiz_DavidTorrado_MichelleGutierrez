@@ -69,41 +69,52 @@ class Entrada(): #Entrada de texto/datos ------ Faltan Arreglos
                 pygame.display.flip()
 
 class Hilo_cliente(threading.Thread): #Hilo
-    def __init__(self,socket):
+    def __init__(self,socket,cliente):
         threading.Thread.__init__(self)
         self.socket = socket
+        self.cliente = cliente
+        self.comenzar = False
     def run(self):
-        instruccion=""
-        while instruccion != "comenzar":
-            data = self.socket.recv(2048)
-            instruccion = data.decode()        
-            v.Pespera(instruccion)
         data = self.socket.recv(2048)
-        instruccion = pickle.loads(data)
-        accion_reaccion(instruccion)
-        sG.snake.start(self)
+        v.posInicio,v.rgb,self.cliente.id = pickle.loads(data)
+        print(self.cliente.id)
+        instruccion=""
+        while "comenzar" not in instruccion:
+            data = self.socket.recv(2048)
+            instruccion = data.decode() 
+            accion_reaccion(instruccion)   
+        self.comenzar = True              
+        print("El hilo escuchara")
         while True:
             try:
                 data = self.socket.recv(2048)
                 instruccion = data.decode()
-                accion_reaccion(instruccion)        
-                if instruccion =="":
-                    continue
+                print(instruccion[1:])
+                if str(self.cliente.id)  in instruccion:
+                    print("esto lo hago yo")
+                    if instruccion !="":
+                        accion_reaccion(instruccion[1:])                  
             except Exception as e:
                 continue
 
 class Cliente(): #Cliente
     host="localhost" #Direccion en la que se conectara el cliente 
-    def iniciar(self):
-        #host = input("Ingrese ip a conectar")
+    def __init__(self):
         try:
             self.mi_socket = socket.socket()
             self.mi_socket.connect((self.host,3000))
+            self.id =0
         except: 
             print("No se ha encontrado el servidor")
-        hilo = Hilo_cliente(self.mi_socket)
-        hilo.start()
 
+    def iniciar(self):
+        #host = input("Ingrese ip a conectar")
+        
+        hilo = Hilo_cliente(self.mi_socket,self)
+        hilo.start()
+        while not hilo.comenzar:
+            v.Pespera(devolver())
+        sG.Snake.start(self)
     def enviar(self,instruccion):
         dt = str(instruccion).encode()
         self.mi_socket.send(dt)

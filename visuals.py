@@ -98,32 +98,33 @@ def num_jugador(): #Seleccion de jugadores para crear server
                     players = 310,310
                     screen = pygame.display.set_mode(players)
                     c = sC.Cliente() 
-                    c.iniciar() 
                     c.enviar(nJugadores)   
+                    c.iniciar() 
                 if event.key == pygame.K_2:
                     nJugadores =2   
                     players = 610,310
                     screen = pygame.display.set_mode(players)
                     start = True  
                     c = sC.Cliente() 
-                    c.iniciar()  
                     c.enviar(nJugadores) 
+                    c.iniciar()  
                 if event.key == pygame.K_3:  
                     nJugadores =3                         
                     players = 610,610
                     screen = pygame.display.set_mode(players)                 
                     start = True   
                     c = sC.Cliente() 
-                    c.iniciar()  
                     c.enviar(nJugadores)
+                    c.iniciar() 
+                    
                 if event.key == pygame.K_4: 
                     nJugadores =4   
                     start = True    
                     players = 610,610
                     screen = pygame.display.set_mode(players)
                     c = sC.Cliente()
-                    c.iniciar()
                     c.enviar(nJugadores)
+                    c.iniciar()
 
 def Pmenu(): #Pantalla Menu de Inicio
     start = False
@@ -150,14 +151,16 @@ def Pmenu(): #Pantalla Menu de Inicio
                     num_jugador()
 
 def Pespera(texto): #Pantalla de espera
+    global posInicio
     jugadores = texto
     screen.fill((0,0,0))
     text = font.render(str("---- Esperando Jugadores ----"),0,(200,60,80))
-    op2 = font.render(str("Jugadores conectados: {}").format(jugadores),0,(200,60,80))
+    op1 = font.render(str("Jugadores conectados: {}").format(jugadores),0,(200,60,80))
     op2 = font.render(str("Escape para abandonar"),0,(200,60,80))
     x = (size[0]/2 - text.get_width()/2, size[1]/2 - text.get_height()/2)
-    screen.blit(text,(x[0]+5,size[1]/3))
-    screen.blit(op2,(x[0],(size[1]/3)+30)) 
+    screen.blit(text,(posInicio[0]+x[0]+5,posInicio[1]+size[1]/3))
+    screen.blit(op2,(posInicio[0]+x[0],posInicio[1]+(size[1]/3)+60))
+    screen.blit(op1,(posInicio[0]+x[0],posInicio[1]+(size[1]/3)+30)) 
     limites()       
     pygame.display.flip()
     for event in pygame.event.get():
