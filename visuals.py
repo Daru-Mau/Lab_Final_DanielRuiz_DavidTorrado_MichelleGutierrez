@@ -14,13 +14,14 @@ food_pos =[]
 pygame.display.set_caption("Snake Online Game")
 
 def puntos(): #posicion de la comida
+    cantidad = 1 #cantidad de puntos que se generaran a la vez
     global food_pos
     if len(food_pos) == 0:
-        for x in range(1):
+        for x in range(cantidad):
             random_posx = random.randint(10,(size[0]/10)-10)*10
             random_posy = random.randint(10,(size[0]/10)-10)*10    
             food_pos.append([random_posx,random_posy])
-    if len(food_pos)<1:
+    if len(food_pos)<cantidad:
         while len(food_pos)<10:
             random_posx = random.randint(10,(size[0]/10)-10)*10
             random_posy = random.randint(10,(size[0]/10)-10)*10    
@@ -165,12 +166,42 @@ def Pespera(texto): #Pantalla de espera
             if event.key == pygame.K_ESCAPE:                 
                 Pmenu()
 
-def Pcontinuar(puntaje): #Pantalla de final/Continuar
+def PcontinuarP(puntaje): #Pantalla de final/Continuar
     global screen
     screen.fill((0,0,0))
     limites()
     score = font.render(str("Puntaje: {}".format(puntaje)),0,(200,60,80))
     text = font.render(str("---- Perdiste ----"),0,(200,60,80))
+    op2 = font.render(str("R para revancha"),0,(200,60,80))
+    op3 = font.render(str("Espacio para continuar"),0,(200,60,80))
+    x = (size[0]/2 - text.get_width() // 2, size[1]/2 - text.get_height() // 2)
+    screen.blit(text,(x[0],size[1]/4))
+    screen.blit(score,(x[0]-20,size[1]/4+30))
+    screen.blit(op2,(x[0]-20,size[1]/4+60))
+    screen.blit(op3,(x[0]-20,(size[1]/4)+90))
+    pygame.display.flip()
+    continuar = False
+    while not continuar:
+        for event in pygame.event.get():            
+            if event.type == pygame.KEYDOWN:
+                if event.type == pygame.QUIT: pygame.quit()
+                if event.key == pygame.K_SPACE:
+                    continuar=True
+                    screen.fill((0,0,0))
+                    players = size
+                    screen = pygame.display.set_mode(players)
+                    Pmenu()
+                if event.key == pygame.K_r:
+                    continuar=True
+                    screen.fill((0,0,0))
+                    Pmenu()
+
+def PcontinuarG(puntaje): #Pantalla de final/Continuar
+    global screen
+    screen.fill((0,0,0))
+    limites()
+    text = font.render(str("---- Ganaste ----"),0,(200,60,80))
+    score = font.render(str("Puntaje: {}".format(puntaje)),0,(200,60,80))
     op2 = font.render(str("R para revancha"),0,(200,60,80))
     op3 = font.render(str("Espacio para continuar"),0,(200,60,80))
     x = (size[0]/2 - text.get_width() // 2, size[1]/2 - text.get_height() // 2)

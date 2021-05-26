@@ -73,14 +73,15 @@ class Hilo_cliente(threading.Thread): #Hilo
         threading.Thread.__init__(self)
         self.socket = socket
     def run(self):
-        data = self.socket.recv(2048)
-        instruccion = data.decode()
+        instruccion=""
         while instruccion != "comenzar":
+            data = self.socket.recv(2048)
+            instruccion = data.decode()        
             v.Pespera(instruccion)
-        sG.snake.start(self)
         data = self.socket.recv(2048)
         instruccion = pickle.loads(data)
         accion_reaccion(instruccion)
+        sG.snake.start(self)
         while True:
             try:
                 data = self.socket.recv(2048)

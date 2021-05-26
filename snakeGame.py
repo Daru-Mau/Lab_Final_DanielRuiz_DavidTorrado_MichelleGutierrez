@@ -7,22 +7,22 @@ pygame.init()
 
 def colisiones(snake_pos,snake_body,score): #Detector de colisiones
     if snake_pos[0] <= v.posInicio[0] or snake_pos[0] >= v.size[0]-10:              
-        return False,v.Pcontinuar(score),sC.accion(score)           
+        return False,v.PcontinuarP(score),sC.accion(score)           
     if snake_pos[1] <= v.posInicio[1] or snake_pos[1] >= v.size[1]-10:
-        return False,v.Pcontinuar(score),sC.accion(score)
+        return False,v.PcontinuarP(score),sC.accion(score)
     for i in range(1,len(snake_body)):
-        if snake_body[i] == snake_pos:   
-            return False,v.Pcontinuar(score)
+        if snake_body[i] == snake_pos:
+            return False,v.PcontinuarP(score)
     return True
 
-def realizar(instruido):
+def recibir(instruido):
     return instruido 
 
 class Snake(): #Juego 
     def start(cliente):
         print("El juego comenzo")
         movimiento = "RIGHT"
-        v.posInicio,v.rgb = realizar(sC.devolver()) #Recive del server la posicion inicial y Recive del server el color del jugador
+        v.posInicio,v.rgb = recibir(sC.devolver()) #Recive del server la posicion inicial y Recive del server el color del jugador
         print("posicion inicial serpiente: ", v.posInicio)
         print("color serpiente: ",v.rgb)
         snake_pos = [v.posInicio[0]+100,v.posInicio[1]+50]
@@ -51,7 +51,7 @@ class Snake(): #Juego
                         if event.key == pygame.K_DOWN:  
                             cliente.enviar("DOWN")
                             movimiento = "DOWN"
-            intruccion = realizar(sC.devolver())
+            intruccion = recibir(sC.devolver())
             if intruccion == "RIGHT":
                 snake_pos[0]+=10
             if intruccion == "LEFT":
@@ -75,6 +75,7 @@ class Snake(): #Juego
                 v.fps.tick(score+5)
             run = colisiones(snake_pos,snake_body,score)               
             pygame.display.flip()
+        cliente.enviar(score)
 
 
 

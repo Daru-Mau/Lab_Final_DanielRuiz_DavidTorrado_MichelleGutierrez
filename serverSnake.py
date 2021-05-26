@@ -2,6 +2,12 @@ import socket, threading,pickle
 
 class Hilo_Partida(threading.Thread): #Hilo e instrucciones
     def __init__(self,conexion,dir,cliente):
+        """[summary]
+        Args:
+            conexion ([type]): [description]
+            dir ([type]): [description]
+            cliente ([type]): [description]
+        """
         threading.Thread.__init__(self)
         self.conexion = conexion
         self.dir = dir
@@ -15,40 +21,40 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
 
     def transmitir(self,dt):
         """[summary] Funcion encargada de transmitir una accion a todos los jugadores conectados
-
         Args:
             dt ([String]): [description]
         """
         for jugador in self.jugadores:
-            try:            
-                instruccion = dt
-                jugador.send(instruccion.encode())
+            try:      
+                print(dt)      
+                jugador.send(dt.encode())
             except Exception as e:
                 continue
 
     def run(self):
+        """[summary]
+        """
         print("\nNueva conexion:",self.dir[0])
-        while len(self.jugadores) < self.limite:
-            self.transmitir(str(self.jugadores))
-        print("El juego puede comenzar")
-        self.transmitir("comenzar")        
-        self.transmitir(pickle.dumps([self.posIni,self.color]))
-        while True:
-            try:
-                dato = self.conexion.recv(2048)
-                dt = dato.decode()
-                if dt == "":
+        if len(self.jugadores) < self.limite:
+            self.transmitir(str(len(self.jugadores)))
+        else:
+            self.transmitir("comenzar")  
+            print("El juego puede comenzar")                  
+            self.conexion.send(pickle.dumps([self.posIni,self.color]))
+            while True:
+                try:
+                    dato = self.conexion.recv(2048)
+                    dt = dato.decode()
+                    if dt == "":
+                        continue
+                    print(self.dir[0],": ",dt)
+                    self.transmitir(dt)
+                except Exception as e:
                     continue
-                print(self.dir[0],": ",dt)
-                self.transmitir(dt)
-            except Exception as e:
-                continue
 
 class Servidor(): #Crear e Iniciar Servidor
-
     def asigIPjugadores(self,ip):
         self.host = ip
-
     def iniciar(self):
         self.jugadoresOnline = []
         self.zonasDisponibles =[[0,0],[310,0],[0,310],[310,310]]
@@ -70,8 +76,8 @@ class Servidor(): #Crear e Iniciar Servidor
         socket_server.listen(4)
         print("\nSocket iniciado:\n Esperando conexiones")
         aceptando = True
-        while aceptando:
-            if len(self.jugadoresOnline) == 0 or len(self.jugadoresOnline) < self.esperandoJugadores:
+        while True:
+            try:
                 conexion,dir = socket_server.accept()
                 if self.esperandoJugadores == 0:
                     self.esperandoJugadores = int(conexion.recv(2048).decode())
@@ -80,8 +86,7 @@ class Servidor(): #Crear e Iniciar Servidor
                 hilo = Hilo_Partida(conexion,dir,self)
                 hilo.start()
                 hilos.append(hilo)
-            else:
-                aceptando = False
-                print("Conexion rechazada.\n Server Lleno")
+            except Exception as e:
+                print(e)
 server = Servidor()
 server.iniciar()
