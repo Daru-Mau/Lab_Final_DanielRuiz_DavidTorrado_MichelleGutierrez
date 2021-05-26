@@ -6,13 +6,16 @@ import snkCliente as sC
 pygame.init()
 
 def colisiones(snake_pos,snake_body,score): #Detector de colisiones
-    if snake_pos[0] <= v.posInicio[0] or snake_pos[0] >= v.size[0]-10:              
-        return False,v.PcontinuarP(score),sC.accion(score)           
-    if snake_pos[1] <= v.posInicio[1] or snake_pos[1] >= v.size[1]-10:
-        return False,v.PcontinuarP(score),sC.accion(score)
+    if snake_pos[0] <= v.posInicio[0]+10 or snake_pos[0] >= v.posInicio[0]+300:
+        print("boom1")             
+        return False,v.PcontinuarP(score),sC.accion(score),sC.c.close()          
+    if snake_pos[1] <= v.posInicio[1]+10 or snake_pos[1] >= v.posInicio[1]+300:
+        print("boom2")  
+        return False,v.PcontinuarP(score),sC.accion(score),sC.c.close()
     #for i in range(1,len(snake_body)):
         if snake_body[i] == snake_pos:
-            return False,v.PcontinuarP(score)
+            print("boom3")  
+            return False,v.PcontinuarP(score),sC.c.close()
     return True
 
 def recibir(instruido):
@@ -21,8 +24,6 @@ def recibir(instruido):
 class Snake(): #Juego 
     def start(cliente):
         print("El juego comenzo") #Recive del server la posicion inicial y Recive del server el color del jugador
-        print("posicion inicial serpiente: ", v.posInicio)
-        print("color serpiente: ",v.rgb)
         snake_pos = [v.posInicio[0]+100,v.posInicio[1]+50]
         snake_body =[[v.posInicio[0]+100,v.posInicio[1]+50],[v.posInicio[0]+90,v.posInicio[1]+50],[v.posInicio[0]+80,v.posInicio[1]+50]]   
         run = True    
@@ -76,7 +77,8 @@ class Snake(): #Juego
                 v.fps.tick(score+5)
             run = colisiones(snake_pos,snake_body,score)               
             pygame.display.flip()
-        cliente.enviar(score)
+        print(f"score{score}")
+        cliente.enviar(f"score{score}")
 
 
 

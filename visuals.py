@@ -75,6 +75,7 @@ def num_jugador(): #Seleccion de jugadores para crear server
     global nJugadores
     start = False
     global screen
+    global c
     screen.fill((0,0,0))
     limites()
     while (not start):
@@ -97,7 +98,7 @@ def num_jugador(): #Seleccion de jugadores para crear server
                     start = True  
                     players = 310,310
                     screen = pygame.display.set_mode(players)
-                    c = sC.Cliente() 
+                    c = sC.Cliente()
                     c.enviar(nJugadores)   
                     c.iniciar() 
                 if event.key == pygame.K_2:
@@ -105,18 +106,17 @@ def num_jugador(): #Seleccion de jugadores para crear server
                     players = 610,310
                     screen = pygame.display.set_mode(players)
                     start = True  
-                    c = sC.Cliente() 
+                    c = sC.Cliente()                    
                     c.enviar(nJugadores) 
                     c.iniciar()  
                 if event.key == pygame.K_3:  
                     nJugadores =3                         
                     players = 610,610
                     screen = pygame.display.set_mode(players)                 
-                    start = True   
-                    c = sC.Cliente() 
+                    start = True
+                    c = sC.Cliente()    
                     c.enviar(nJugadores)
-                    c.iniciar() 
-                    
+                    c.iniciar()                     
                 if event.key == pygame.K_4: 
                     nJugadores =4   
                     start = True    
@@ -150,12 +150,12 @@ def Pmenu(): #Pantalla Menu de Inicio
                     start = True                    
                     num_jugador()
 
-def Pespera(texto): #Pantalla de espera
+def Pespera(texto,cliente): #Pantalla de espera
     global posInicio
     jugadores = texto
     screen.fill((0,0,0))
     text = font.render(str("---- Esperando Jugadores ----"),0,(200,60,80))
-    op1 = font.render(str("Jugadores conectados: {}").format(jugadores),0,(200,60,80))
+    op1 = font.render(str("Jugadores faltantes: {}").format(jugadores),0,(200,60,80))
     op2 = font.render(str("Escape para abandonar"),0,(200,60,80))
     x = (size[0]/2 - text.get_width()/2, size[1]/2 - text.get_height()/2)
     screen.blit(text,(posInicio[0]+x[0]+5,posInicio[1]+size[1]/3))
@@ -164,9 +164,13 @@ def Pespera(texto): #Pantalla de espera
     limites()       
     pygame.display.flip()
     for event in pygame.event.get():
-        if event.type == pygame.QUIT: pygame.quit()
+        if event.type == pygame.QUIT: 
+            cliente.mi_socket.close()  
+            pygame.quit()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:                 
+            if event.key == pygame.K_ESCAPE:    
+                cliente.mi_socket.close()                
+                pygame.display.set_mode(size)             
                 Pmenu()
 
 def PcontinuarP(puntaje): #Pantalla de final/Continuar
@@ -197,6 +201,8 @@ def PcontinuarP(puntaje): #Pantalla de final/Continuar
                 if event.key == pygame.K_r:
                     continuar=True
                     screen.fill((0,0,0))
+                    players = size
+                    screen = pygame.display.set_mode(players)
                     Pmenu()
 
 def PcontinuarG(puntaje): #Pantalla de final/Continuar

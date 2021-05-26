@@ -34,10 +34,10 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
     def run(self):
         """[summary]
         """
-        global jugadoresOnline
-        print("\nNueva conexion:",self.dir[0])
+        global jugadoresOnline,puntajes
+        print("\nNueva conexion:",self.dir[0]) 
         if len(jugadoresOnline) < self.limite:
-            self.transmitir(str(len(self.jugadores)))
+            self.transmitir(str(self.limite-len(jugadoresOnline)))
         elif len(jugadoresOnline) == self.limite:
             self.transmitir("comenzar")  
             print("El juego puede comenzar")                  
@@ -45,16 +45,21 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
                 try:
                     dato = self.conexion.recv(2048)
                     dt = dato.decode()
-                    print(dt)
-                    if dt != "":
-                        self.transmitir(dt)
+                    if(dt != ""):
+                        if "score" in dt:
+                            puntajes.append(dt)
+                            if len(puntajes)==self.limite:
+                                puntajes.sort()
+                                self.transmitir(puntajes[0])
+                        else:
+                            self.transmitir(dt)
                     else:
                         self.transmitir("")
-                    print(self.dir[0],": ",dt)
                 except Exception as e:
                     continue
 
 jugadoresOnline = []
+puntajes =[]
 
 class Servidor(): #Crear e Iniciar Servidor
     def asigIPjugadores(self,ip):
@@ -65,7 +70,7 @@ class Servidor(): #Crear e Iniciar Servidor
         self.coloresDisponibles =[[199,0,57],[27,227,106],[245,187,4],[32,229,16]]
         self.esperandoJugadores = 0
         hilos =[]
-        host="localhost" #Direccion con la que se iniciara el server
+        host="26.19.70.130" #Direccion con la que se iniciara el server
         """
         socket_server = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         socket_server.connect(("8.8.8.8", 80))

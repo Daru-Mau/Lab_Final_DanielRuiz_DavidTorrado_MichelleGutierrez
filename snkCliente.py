@@ -74,31 +74,33 @@ class Hilo_cliente(threading.Thread): #Hilo
         self.socket = socket
         self.cliente = cliente
         self.comenzar = False
-    def run(self):
-        data = self.socket.recv(2048)
-        v.posInicio,v.rgb,self.cliente.id = pickle.loads(data)
-        print(self.cliente.id)
-        instruccion=""
-        while "comenzar" not in instruccion:
+        self.terminar = False
+    def run(self):        
+        try:
             data = self.socket.recv(2048)
-            instruccion = data.decode() 
-            accion_reaccion(instruccion)   
-        self.comenzar = True              
-        print("El hilo escuchara")
-        while True:
-            try:
+            v.posInicio,v.rgb,self.cliente.id = pickle.loads(data)
+            instruccion=""
+            while "comenzar" not in instruccion:
+                data = self.socket.recv(2048)
+                instruccion = data.decode() 
+                accion_reaccion(instruccion[1:])   
+            self.comenzar = True          
+            while True:
                 data = self.socket.recv(2048)
                 instruccion = data.decode()
-                print(instruccion[1:])
-                if str(self.cliente.id)  in instruccion:
-                    print("esto lo hago yo")
-                    if instruccion !="":
-                        accion_reaccion(instruccion[1:])                  
-            except Exception as e:
-                continue
+                if instruccion !="":
+                    if "ganador" in instruccion:
+                        self.terminar = True
+                    else:
+                        if str(self.cliente.id) in instruccion:                    
+                            accion_reaccion(instruccion[1:]) 
+                        else:
+                            print()                 
+        except Exception as e:
+            print()
 
 class Cliente(): #Cliente
-    host="localhost" #Direccion en la que se conectara el cliente 
+    host="26.19.70.130" #Direccion en la que se conectara el cliente 
     def __init__(self):
         try:
             self.mi_socket = socket.socket()
@@ -113,8 +115,12 @@ class Cliente(): #Cliente
         hilo = Hilo_cliente(self.mi_socket,self)
         hilo.start()
         while not hilo.comenzar:
-            v.Pespera(devolver())
+            v.Pespera(devolver(),self)
         sG.Snake.start(self)
     def enviar(self,instruccion):
-        dt = str(instruccion).encode()
-        self.mi_socket.send(dt)
+        if "score" in str(instruccion):
+            dt = str(f"{self.id}{instruccion}").encode()
+            self.mi_socket.send(dt)
+        else:
+            dt = str(instruccion).encode()
+            self.mi_socket.send(dt)
