@@ -16,17 +16,17 @@ pygame.display.set_caption("Snake Online Game")
 def puntos(): #posicion de la comida
     cantidad = 1 #cantidad de puntos que se generaran a la vez
     global food_pos
-    x = posInicio[0]+20
-    y = posInicio[1]+20
+    x = posInicio[0]+10
+    y = posInicio[1]+10
     if len(food_pos) == 0:
         for x in range(cantidad):
-            random_posx = random.randint(x,((posInicio[0]+size[0])/10)-10)*10
-            random_posy = random.randint(y,((posInicio[1]+size[1])/10)-10)*10    
+            random_posx = random.randint(x,((posInicio[0]+(size[0]-10))/10))*10
+            random_posy = random.randint(y,((posInicio[1]+(size[1]-10))/10))*10      
             food_pos.append([random_posx,random_posy])
     if len(food_pos)<cantidad:
         while len(food_pos)<cantidad:
-            random_posx = random.randint(x,((posInicio[0]+size[0])/10)-10)*10
-            random_posy = random.randint(y,((posInicio[1]+size[1])/10)-10)*10    
+            random_posx = random.randint(x,((posInicio[0]+(size[0]-10))/10))*10
+            random_posy = random.randint(y,((posInicio[1]+(size[1]-10))/10))*10    
             food_pos.append([random_posx,random_posy])
     return food_pos
 

@@ -88,7 +88,6 @@ class Hilo_cliente(threading.Thread): #Hilo
             while True:
                 data = self.socket.recv(2048)
                 instruccion = data.decode()
-                print(instruccion)
                 if instruccion !="":
                     if "ganador" in instruccion:
                         self.terminar = True
