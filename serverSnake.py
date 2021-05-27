@@ -16,14 +16,13 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
         self.limite = cliente.esperandoJugadores
         self.posIni = cliente.zonasDisponibles[len(self.jugadores)-1]
         self.color = cliente.coloresDisponibles[len(self.jugadores)-1]
-        self.conexion.send(pickle.dumps([self.posIni,self.color,self.id]))
+        self.conexion.send(pickle.dumps([self.posIni,self.color,f"j{self.id}"]))
 
     def transmitir(self,dt):
         """[summary] Funcion encargada de transmitir una accion a todos los jugadores conectados
         Args:
             dt ([String]): [description]
         """
-        print(dt)
         global jugadoresOnline
         for jugador in jugadoresOnline:
             try: 
@@ -37,7 +36,7 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
         global jugadoresOnline,puntajes,aceptando
         print("\nNueva conexion:",self.dir[0]) 
         if len(jugadoresOnline) < self.limite:
-            self.transmitir(str(self.limite-len(jugadoresOnline)))
+            self.transmitir(self.limite-len(jugadoresOnline))
         elif len(jugadoresOnline) == self.limite:
             self.transmitir("comenzar")               
             while True:

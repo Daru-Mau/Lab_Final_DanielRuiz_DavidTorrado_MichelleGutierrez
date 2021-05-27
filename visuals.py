@@ -16,15 +16,17 @@ pygame.display.set_caption("Snake Online Game")
 def puntos(): #posicion de la comida
     cantidad = 1 #cantidad de puntos que se generaran a la vez
     global food_pos
+    x = posInicio[0]+20
+    y = posInicio[1]+20
     if len(food_pos) == 0:
         for x in range(cantidad):
-            random_posx = random.randint(posInicio[0]+10,(((posInicio[0]+size[0])/10)-10))*10
-            random_posy = random.randint(posInicio[1]+10,(((posInicio[0]+size[0])/10)-10))*10   
+            random_posx = random.randint(x,((posInicio[0]+size[0])/10)-10)*10
+            random_posy = random.randint(y,((posInicio[1]+size[1])/10)-10)*10    
             food_pos.append([random_posx,random_posy])
     if len(food_pos)<cantidad:
-        while len(food_pos)<10:
-            random_posx = random.randint(posInicio[0]+10,(((posInicio[0]+size[0])/10)-10))*10
-            random_posy = random.randint(posInicio[1]+10,(((posInicio[0]+size[0])/10)-10))*10      
+        while len(food_pos)<cantidad:
+            random_posx = random.randint(x,((posInicio[0]+size[0])/10)-10)*10
+            random_posy = random.randint(y,((posInicio[1]+size[1])/10)-10)*10    
             food_pos.append([random_posx,random_posy])
     return food_pos
 
@@ -177,7 +179,7 @@ def PcontinuarP(puntaje,cliente): #Pantalla de final/Continuar
     global screen
     screen.fill((0,0,0))
     limites()
-    score = font.render(str("Puntaje: {}".format(puntaje)),0,(200,60,80))
+    score = font.render(str(f"Puntaje: {puntaje}"),0,(200,60,80))
     text = font.render(str("---- Perdiste ----"),0,(200,60,80))
     op2 = font.render(str("R para revancha"),0,(200,60,80))
     op3 = font.render(str("Espacio para continuar"),0,(200,60,80))
@@ -213,7 +215,7 @@ def PcontinuarG(puntaje,cliente): #Pantalla de final/Continuar
     screen.fill((0,0,0))
     limites()
     text = font.render(str("---- Ganaste ----"),0,(200,60,80))
-    score = font.render(str("Puntaje: {}".format(puntaje)),0,(200,60,80))
+    score = font.render(str(f"Puntaje: {puntaje}"),0,(200,60,80))
     op2 = font.render(str("R para revancha"),0,(200,60,80))
     op3 = font.render(str("Espacio para continuar"),0,(200,60,80))
     x = (size[0]/2 - text.get_width() // 2, size[1]/2 - text.get_height() // 2)

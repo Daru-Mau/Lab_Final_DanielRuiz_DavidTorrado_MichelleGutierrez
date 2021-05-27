@@ -83,7 +83,7 @@ class Hilo_cliente(threading.Thread): #Hilo
             while "comenzar" not in instruccion:
                 data = self.socket.recv(2048)
                 instruccion = data.decode() 
-                accion_reaccion(instruccion[1:])   
+                accion_reaccion(instruccion[2:])   
             self.comenzar = True          
             while True:
                 data = self.socket.recv(2048)
@@ -93,12 +93,12 @@ class Hilo_cliente(threading.Thread): #Hilo
                     if "ganador" in instruccion:
                         self.terminar = True
                         if str(self.cliente.id) in instruccion:
-                            accion_reaccion(f"ganaste{instruccion[-1:]}")
+                            accion_reaccion(f"ganaste{instruccion[13:]}")
                         else:
-                            accion_reaccion(f"perdiste{instruccion[-1:]}")
+                            accion_reaccion(f"perdiste{instruccion[13:]}")
                     else:
                         if str(self.cliente.id) in instruccion:                    
-                            accion_reaccion(instruccion[1:])                
+                            accion_reaccion(instruccion[2:])                
         except Exception as e:
             print()
 
@@ -122,9 +122,9 @@ class Cliente(): #Cliente
         while not hilo.terminar:
             v.Pespera(devolver(),self)
         if "ganaste" in devolver():
-            v.PcontinuarG(devolver()[-1:],self)
+            v.PcontinuarG(devolver()[8:],self)
         else:
-            v.PcontinuarP(devolver()[-1:],self)
+            v.PcontinuarP(devolver()[8:],self)
 
     def enviar(self,instruccion):
         dt = str(f"{self.id}{instruccion}").encode()
