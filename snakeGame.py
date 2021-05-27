@@ -7,9 +7,9 @@ pygame.init()
 
 def colisiones(snake_pos,snake_body,c,score): #Detector de colisiones
     if snake_pos[0] <= v.posInicio[0]+10 or snake_pos[0] >= v.posInicio[0]+300:
-        return False     
+        return False#,c.enviar(f"score{score}")      
     if snake_pos[1] <= v.posInicio[1]+10 or snake_pos[1] >= v.posInicio[1]+300:    
-        return False
+        return False#,c.enviar(f"score{score}")
     #for i in range(2,len(snake_body)):
         if snake_body[i] == snake_pos:
             return False
@@ -73,9 +73,10 @@ class Snake(): #Juego
                 v.fps.tick(10)
             elif score < 50:
                 v.fps.tick(score+5)
-            run = colisiones(snake_pos,snake_body,cliente,score)               
+            run = colisiones(snake_pos,snake_body,cliente,score)  
+            if run == False:
+                cliente.enviar(f"score{score}")             
             pygame.display.flip() 
-        cliente.enviar(f"score{score}") 
               
 
 

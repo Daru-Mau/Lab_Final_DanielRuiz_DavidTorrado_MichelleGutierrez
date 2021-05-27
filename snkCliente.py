@@ -88,6 +88,7 @@ class Hilo_cliente(threading.Thread): #Hilo
             while True:
                 data = self.socket.recv(2048)
                 instruccion = data.decode()
+                print(instruccion)
                 if instruccion !="":
                     if "ganador" in instruccion:
                         self.terminar = True
@@ -126,12 +127,5 @@ class Cliente(): #Cliente
             v.PcontinuarP(devolver()[-1:],self)
 
     def enviar(self,instruccion):
-        if "score" in str(instruccion):
-            dt = instruccion.encode()
-            self.mi_socket.send(dt)
-        #elif "jugador" in instruccion[0]:
-            #self.mi_socket.send("posicion".encode())
-            #self.mi_socket.send(pickle.dumps([f"j{self.id}",instruccion[1],instruccion[2]]))
-        else:
-            dt = str(instruccion).encode()
-            self.mi_socket.send(dt)
+        dt = str(f"{self.id}{instruccion}").encode()
+        self.mi_socket.send(dt)

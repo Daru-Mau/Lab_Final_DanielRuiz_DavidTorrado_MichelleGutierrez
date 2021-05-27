@@ -23,11 +23,11 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
         Args:
             dt ([String]): [description]
         """
-        print(self.id,dt)
+        print(dt)
         global jugadoresOnline
         for jugador in jugadoresOnline:
             try: 
-                jugador.send(f"{self.id}{dt}".encode())
+                jugador.send(f"{dt}".encode())
             except Exception as e:
                 continue
 
