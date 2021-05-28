@@ -17,54 +17,37 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
         self.posIni = cliente.zonasDisponibles[len(self.jugadores)-1]
         self.color = cliente.coloresDisponibles[len(self.jugadores)-1]
         self.conexion.send(pickle.dumps([self.posIni,self.color,f"j{self.id}"]))
-
-    def transmitir(self,dt):
-        """[summary] Funcion encargada de transmitir una accion a todos los jugadores conectados
-        Args:
-            dt ([String]): [description]
-        """
-        global jugadoresOnline
-        for jugador in jugadoresOnline:
-            try: 
-                jugador.send(f"{dt}".encode())
-            except Exception as e:
-                continue
-
     def run(self):
         """[summary]
         """
-        global jugadoresOnline,puntajes,aceptando
+        global jugadoresOnline,puntajes,aceptando  
         print("\nNuevo jugador:",self.dir[0]) 
-        if len(jugadoresOnline) < self.limite:
-            self.transmitir(self.limite-len(jugadoresOnline))
-        elif len(jugadoresOnline) == self.limite:
-            self.transmitir("comenzar")               
-            while True:
-                try:
-                    dato = self.conexion.recv(2048)
-                    dt = dato.decode()
-                    print(dt)
-                    if(dt != ""):
-                        if "score" in dt:
-                            puntajes.append(dt)
-                            if len(puntajes)==len(jugadoresOnline):
-                                puntajes.sort()
-                                self.transmitir(f"ganador{puntajes[0]}")
-                        #elif "posicion" in dt:
-                            #dato = self.conexion.recv(2048)
-                            #datos = pickle.loads(dato)
-                        elif "salir" in dt:
-                            jugadoresOnline.remove(self.conexion) 
-                            puntajes.clear()                           
-                            self.conexion.close()
-                            aceptando = True
-                            print("se aceptan mas jugadores")
-                        else:
-                            self.transmitir(dt)
+        while True:
+            try:
+                dato = self.conexion.recv(2048)
+                dt:str = dato.decode()
+                print(dt)
+                if(dt != ""):
+                    if "score" in dt:
+                        puntajes.append(dt)
+                        if len(puntajes)==len(jugadoresOnline):
+                            puntajes.sort()
+                            self.conexion.send(f"ganador{puntajes[0]}".encode())
+                    #elif "posicion" in dt:
+                        #dato = self.conexion.recv(2048)
+                        #datos = pickle.loads(dato)
+                    elif "salir" in dt:
+                        jugadoresOnline.remove(self.conexion) 
+                        puntajes.clear()                           
+                        self.conexion.close()
+                        aceptando = True
+                        print("se aceptan mas jugadores")
                     else:
-                        self.transmitir("")
-                except Exception as e:
-                    continue
+                        self.conexion.send(dt.encode())
+                else:
+                    self.conexion.send("".encode())
+            except Exception as e:
+                continue
 
 jugadoresOnline = []
 puntajes =[]
@@ -73,6 +56,7 @@ aceptando = True
 class Servidor(): #Crear e Iniciar Servidor
     def asigIPjugadores(self,ip):
         self.host = ip
+        print("casa")
     def iniciar(self):
         global jugadoresOnline
         self.zonasDisponibles =[[0,0],[300,0],[0,300],[300,300]]
@@ -98,7 +82,7 @@ class Servidor(): #Crear e Iniciar Servidor
             try:
                 conexion,dir = socket_server.accept()
                 if aceptando == False:
-                    conexion.send("Server Lleno".encode)
+                    conexion.send("Server Lleno".encode())
                     conexion.close()
                 else:
                     if len(jugadoresOnline) == 0:
@@ -110,7 +94,23 @@ class Servidor(): #Crear e Iniciar Servidor
                     hilo = Hilo_Partida(conexion,dir,self)
                     hilo.start()
                     hilos.append(hilo)
+                    if len(jugadoresOnline) < self.esperandoJugadores:
+                        self.transmitir(f"{self.esperandoJugadores-len(jugadoresOnline)}".encode())
+                    elif len(jugadoresOnline) == self.esperandoJugadores:
+                        self.transmitir("comenzar") 
             except Exception as e:
                 print(e)
+
+    def transmitir(self,dt):
+        """[summary] Funcion encargada de transmitir una accion a todos los jugadores conectados
+        Args:
+            dt ([String]): [description]
+        """
+        global jugadoresOnline
+        for jugador in jugadoresOnline:
+            try: 
+                jugador.send(f"{dt}".encode())
+            except Exception as e:
+                continue
 server = Servidor()
 server.iniciar()
