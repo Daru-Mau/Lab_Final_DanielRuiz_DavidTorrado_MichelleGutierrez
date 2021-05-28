@@ -14,8 +14,9 @@ food_pos =[]
 pygame.display.set_caption("Snake Online Game")
 
 def puntos(): #posicion de la comida
-    cantidad = 1 #cantidad de puntos que se generaran a la vez
+    cantidad = 10 #cantidad de puntos que se generaran a la vez
     global food_pos
+    global posInicio
     x = posInicio[0]+10
     y = posInicio[1]+10
     if len(food_pos) == 0:
@@ -94,7 +95,8 @@ def num_jugador(): #Seleccion de jugadores para crear server
         screen.blit(op4,(x[0]+20,(size[1]/5)+120))      
         pygame.display.flip()        
         for event in pygame.event.get():
-            if event.type == pygame.QUIT: pygame.quit()
+            if event.type == pygame.QUIT: 
+                pygame.quit()                
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_1:     
                     start = True  
@@ -158,7 +160,7 @@ def Pespera(texto,cliente): #Pantalla de espera
     screen.fill((0,0,0))
     text = font.render(str("---- Esperando Jugadores ----"),0,(200,60,80))
     op1 = font.render(str(f"Jugadores faltantes: {jugadores}"),0,(200,60,80))
-    op2 = font.render(str("Escape para abandonar"),0,(200,60,80))
+    op2 = font.render(str("Espacio para abandonar"),0,(200,60,80))
     x = (size[0]/2 - text.get_width()/2, size[1]/2 - text.get_height()/2)
     screen.blit(text,(posInicio[0]+x[0]+5,posInicio[1]+size[1]/3))
     screen.blit(op2,(posInicio[0]+x[0],posInicio[1]+(size[1]/3)+60))
@@ -167,11 +169,15 @@ def Pespera(texto,cliente): #Pantalla de espera
     pygame.display.flip()
     for event in pygame.event.get():
         if event.type == pygame.QUIT: 
-            cliente.mi_socket.close()  
+            cliente.enviar("salir")
+            print("cliente fuera")
+            cliente.mi_socket.close()
             pygame.quit()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:    
-                cliente.mi_socket.close()                
+            if event.key == pygame.K_SPACE:   
+                cliente.enviar("salir")
+                print("cliente fuera")
+                cliente.mi_socket.close()               
                 pygame.display.set_mode(size)             
                 Pmenu()
 
@@ -193,7 +199,11 @@ def PcontinuarP(puntaje,cliente): #Pantalla de final/Continuar
     while not continuar:
         for event in pygame.event.get():            
             if event.type == pygame.KEYDOWN:
-                if event.type == pygame.QUIT: pygame.quit()
+                if event.type == pygame.QUIT: 
+                    pygame.quit()
+                    cliente.enviar("salir")
+                    print("cliente fuera")
+                    cliente.mi_socket.close()
                 if event.key == pygame.K_SPACE:
                     continuar=True
                     screen.fill((0,0,0))

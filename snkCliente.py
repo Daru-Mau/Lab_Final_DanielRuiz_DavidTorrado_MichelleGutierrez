@@ -102,7 +102,7 @@ class Hilo_cliente(threading.Thread): #Hilo
             print()
 
 class Cliente(): #Cliente
-    host="26.19.70.130" #Direccion en la que se conectara el cliente 
+    host="localhost" #Direccion en la que se conectara el cliente 
     def __init__(self):
         try:
             self.mi_socket = socket.socket()

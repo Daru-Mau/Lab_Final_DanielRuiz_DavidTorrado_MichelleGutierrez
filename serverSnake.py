@@ -34,7 +34,7 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
         """[summary]
         """
         global jugadoresOnline,puntajes,aceptando
-        print("\nNueva conexion:",self.dir[0]) 
+        print("\nNuevo jugador:",self.dir[0]) 
         if len(jugadoresOnline) < self.limite:
             self.transmitir(self.limite-len(jugadoresOnline))
         elif len(jugadoresOnline) == self.limite:
@@ -52,11 +52,12 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
                         #elif "posicion" in dt:
                             #dato = self.conexion.recv(2048)
                             #datos = pickle.loads(dato)
-                        elif dt == "salir":
-                            jugadoresOnline.remove(self.conexion)                            
+                        elif "salir" in dt:
+                            jugadoresOnline.remove(self.conexion) 
+                            puntajes.clear()                           
                             self.conexion.close()
                             aceptando = True
-                            print("se ha desconectado")
+                            print("se aceptan mas jugadores")
                         else:
                             self.transmitir(dt)
                     else:
@@ -77,7 +78,7 @@ class Servidor(): #Crear e Iniciar Servidor
         self.coloresDisponibles =[[199,0,57],[27,227,106],[245,187,4],[32,229,16]]
         self.esperandoJugadores = 0
         hilos =[]
-        host="26.19.70.130" #Direccion con la que se iniciara el server
+        host="localhost" #Direccion con la que se iniciara el server
         """
         socket_server = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         socket_server.connect(("8.8.8.8", 80))
@@ -89,7 +90,7 @@ class Servidor(): #Crear e Iniciar Servidor
             socket_server.bind((host,3000))
         except socket.error as e:
             str(e)
-        socket_server.listen(4)
+        socket_server.listen()
         print("\nSocket iniciado:\n Esperando jugadores")
         global aceptando
         while True:
@@ -103,6 +104,7 @@ class Servidor(): #Crear e Iniciar Servidor
                         self.esperandoJugadores = int(conexion.recv(2048).decode())
                     jugadoresOnline.append(conexion)
                     if len(jugadoresOnline)==self.esperandoJugadores:
+                        print("ya no se aceptan mas jugadores")
                         aceptando = False
                     hilo = Hilo_Partida(conexion,dir,self)
                     hilo.start()
