@@ -82,23 +82,22 @@ class Hilo_cliente(threading.Thread): #Hilo
             instruccion=""
             while "comenzar" not in instruccion:
                 data:str = self.socket.recv(2048)
-                instruccion = data.decode() 
+                instruccion = data.decode()
                 accion_reaccion(instruccion)   
             self.comenzar = True          
             while True:
                 data:str = self.socket.recv(2048)
                 instruccion = data.decode()
-                print(instruccion)
                 if instruccion !="":
                     if "ganador" in instruccion:
                         self.terminar = True
                         if str(self.cliente.id) in instruccion:
-                            accion_reaccion(f"ganaste{instruccion[13:]}")
+                            accion_reaccion(f"{instruccion[12:]}")
                         else:
-                            accion_reaccion(f"ganador{instruccion[13:]}")
+                            accion_reaccion(f"{instruccion[12:]}")
                     else:
                         if str(self.cliente.id) in instruccion:                    
-                            accion_reaccion(instruccion[2:])                
+                            accion_reaccion(instruccion)                
         except Exception as e:
             print()
 
@@ -120,12 +119,12 @@ class Cliente(): #Cliente
             v.Pespera(devolver(),self)
         sG.Snake.start(self)
         while not hilo.terminar:
-            v.Pespera(devolver(),self)
-        if "ganaste" in devolver():
-            v.PcontinuarG(devolver()[8:],self)
+            v.Pespera(" Moriste",self)
+        if "ganador" and self.id in devolver():
+            v.PcontinuarG(devolver(),self)
         else:
-            v.PcontinuarP(devolver()[8:],self)
+            v.PcontinuarP(devolver(),self)
 
     def enviar(self,instruccion):
-        dt = str(f"{self.id}{instruccion}").encode()
+        dt = str(f"{instruccion}{self.id}").encode()
         self.mi_socket.send(dt)

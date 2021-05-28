@@ -28,12 +28,11 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
             try:
                 dato = self.conexion.recv(2048)
                 dt:str = dato.decode()
-                print(dt)
                 if(dt != ""):
                     if "score" in dt:
                         puntajes.append(dt)
                         if len(puntajes)==len(jugadoresOnline):
-                            puntajes.sort()
+                            puntajes.sort(reverse=True)
                             self.server.transmitir(f"ganador{puntajes[0]}")
                     #elif "posicion" in dt:
                         #dato = self.conexion.recv(2048)
@@ -62,14 +61,7 @@ class Servidor(): #Crear e Iniciar Servidor
         self.zonasDisponibles =[[0,0],[300,0],[0,300],[300,300]]
         self.coloresDisponibles =[[199,0,57],[27,227,106],[245,187,4],[32,229,16]]
         self.esperandoJugadores = 0
-        hilos =[]
         host="26.19.70.130" #Direccion con la que se iniciara el server
-        """
-        socket_server = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-        socket_server.connect(("8.8.8.8", 80))
-        server = socket_server.getsockname()[0]
-        socket_server.close
-        """
         socket_server = socket.socket()
         try:
             socket_server.bind((host,3000))
@@ -86,16 +78,15 @@ class Servidor(): #Crear e Iniciar Servidor
                     conexion.close()
                 else:
                     if len(jugadoresOnline) == 0:
-                        self.esperandoJugadores = int(conexion.recv(2048).decode())
+                        self.esperandoJugadores = int(conexion.recv(2048).decode()[:1])
                     jugadoresOnline.append(conexion)
                     if len(jugadoresOnline)==self.esperandoJugadores:
                         aceptando = False
                     hilo = Hilo_Partida(conexion,dir,self)
                     hilo.start()
-                    hilos.append(hilo)
                     if len(jugadoresOnline) < self.esperandoJugadores:
                         self.transmitir(f"{self.esperandoJugadores-len(jugadoresOnline)}")
-                    elif len(jugadoresOnline) == self.esperandoJugadores:
+                    if len(jugadoresOnline) == self.esperandoJugadores:
                         self.transmitir("comenzar") 
             except Exception as e:
                 print(e)

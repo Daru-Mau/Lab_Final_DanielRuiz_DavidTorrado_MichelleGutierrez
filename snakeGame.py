@@ -20,18 +20,19 @@ def recibir(instruido):
 
 class Snake(): #Juego 
     def start(cliente):
-        print("El juego comenzo") #Recive del server la posicion inicial y Recive del server el color del jugador
         snake_pos = [v.posInicio[0]+100,v.posInicio[1]+50]
         snake_body =[[v.posInicio[0]+100,v.posInicio[1]+50],[v.posInicio[0]+90,v.posInicio[1]+50],[v.posInicio[0]+80,v.posInicio[1]+50]]   
         run = True    
         food_pos = v.puntos()    
         score = 0
         instruccion = "RIGHT"
-        print(instruccion)
         cliente.enviar(instruccion)
         while run:        
             for event in pygame.event.get():
-                if event.type == pygame.QUIT: pygame.quit()
+                if event.type == pygame.QUIT: 
+                    pygame.quit()
+                    cliente.enviar("salir")
+                    cliente.mi_socket.close()
                 if event.type == pygame.KEYDOWN:
                     if instruccion != "LEFT":
                         if event.key == pygame.K_RIGHT:  
@@ -51,16 +52,15 @@ class Snake(): #Juego
                             instruccion = "DOWN"
             if recibir(sC.devolver()) != "":
                  instruccion = recibir(sC.devolver())
-            if instruccion == "RIGHT":
+            if "RIGHT" in instruccion:
                 snake_pos[0]+=10
-            if instruccion == "LEFT":
+            if "LEFT" in instruccion:
                 snake_pos[0]-=10
-            if instruccion == "UP":
+            if "UP" in instruccion:
                 snake_pos[1]-=10
-            if instruccion == "DOWN":
+            if "DOWN" in instruccion:
                 snake_pos[1]+=10            
             snake_body.insert(0,list(snake_pos)) 
-            #cliente.enviar("jugador",snake_body,food_pos) #Enviar posicion del jugador y sus puntos
             snake_body,score,food_pos = v.comer(snake_pos,snake_body,food_pos,score)  
             v.screen.fill((0,0,0))
             v.limites() 

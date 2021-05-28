@@ -20,10 +20,9 @@ def puntos(): #posicion de la comida
     x = posInicio[0]+10
     y = posInicio[1]+10
     if len(food_pos) == 0:
-        for pos in range(cantidad):
+        for _ in range(cantidad):
             random_posx = round(random.randint(x,x+300)//10)*10
             random_posy = round(random.randint(y,y+300)//10)*10 
-            print([random_posx,random_posy]) 
             food_pos.append([random_posx,random_posy])
     if len(food_pos)<cantidad:
         while len(food_pos)<cantidad:
@@ -42,13 +41,14 @@ def comer(snake_pos,snake_body,food_pos,score): #Metodo de comer
     snake_body.pop()            
     return snake_body,score,food_pos
 
-def randomColor(): #Generador del color de la serpiente
+def randomColor(): #Generador random del color de la serpiente
     global rgb
     for i in range(3):
         rgb[i] = random.randint(0,255)
     return rgb
 
-def limites(): #Bordes del juego
+def limites(): #Bordes del juego - Primer misterio "PORQUE RAYOS NO FUNCIONA"
+    global nJugadores
     if nJugadores == 1:
         pygame.draw.rect(screen,(200,60,80),pygame.Rect(0,(players[1]/2)-10,players[1]/2,10)) # barra medio
         pygame.draw.rect(screen,(200,60,80),pygame.Rect((players[0]/2)-10,0,10,players[0]/2)) #barra vertical
@@ -171,13 +171,11 @@ def Pespera(texto,cliente): #Pantalla de espera
     for event in pygame.event.get():
         if event.type == pygame.QUIT: 
             cliente.enviar("salir")
-            print("cliente fuera")
             cliente.mi_socket.close()
             pygame.quit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:   
                 cliente.enviar("salir")
-                print("cliente fuera")
                 cliente.mi_socket.close()               
                 pygame.display.set_mode(size)             
                 Pmenu()
@@ -192,9 +190,9 @@ def PcontinuarP(puntaje,cliente): #Pantalla de final/Continuar
     op2 = font.render(str("R para revancha"),0,(200,60,80))
     op3 = font.render(str("Espacio para continuar"),0,(200,60,80))
     x = (size[0]/2 - text.get_width() // 2, size[1]/2 - text.get_height() // 2)
-    screen.blit(text,(x[0],size[1]/4))
+    screen.blit(text,(posInicio[0]+x[0],posInicio[1]+size[1]/4))
     screen.blit(score,(posInicio[0]+x[0]-20,(posInicio[1]+size[1]/4)+30))
-    screen.blit(op2,(posInicio[0]+x[0]-20,(posInicio[1]+size[1]/4)+60))
+    #screen.blit(op2,(posInicio[0]+x[0]-20,(posInicio[1]+size[1]/4)+60))
     screen.blit(op3,(posInicio[0]+x[0]-20,(posInicio[1]+size[1]/4)+90))
     pygame.display.flip()
     continuar = False
@@ -204,23 +202,22 @@ def PcontinuarP(puntaje,cliente): #Pantalla de final/Continuar
                 if event.type == pygame.QUIT: 
                     pygame.quit()
                     cliente.enviar("salir")
-                    print("cliente fuera")
                     cliente.mi_socket.close()
                 if event.key == pygame.K_SPACE:
                     continuar=True
                     screen.fill((0,0,0))
                     players = size
                     cliente.enviar("salir")
-                    print("cliente fuera")
                     cliente.mi_socket.close()
                     screen = pygame.display.set_mode(players)
                     Pmenu()
-                if event.key == pygame.K_r:
+                """if event.key == pygame.K_r:
                     continuar=True
                     screen.fill((0,0,0))
                     players = size
                     screen = pygame.display.set_mode(players)
                     Pespera("nombre",cliente)
+                    """
 
 def PcontinuarG(puntaje,cliente): #Pantalla de final/Continuar
     global screen
@@ -233,7 +230,7 @@ def PcontinuarG(puntaje,cliente): #Pantalla de final/Continuar
     x = (size[0]/2 - text.get_width() // 2, size[1]/2 - text.get_height() // 2)
     screen.blit(text,(posInicio[0]+x[0],posInicio[1]+size[1]/4))
     screen.blit(score,(posInicio[0]+x[0]-20,(posInicio[1]+size[1]/4)+30))
-    screen.blit(op2,(posInicio[0]+x[0]-20,(posInicio[1]+size[1]/4)+60))
+    #screen.blit(op2,(posInicio[0]+x[0]-20,(posInicio[1]+size[1]/4)+60))
     screen.blit(op3,(posInicio[0]+x[0]-20,(posInicio[1]+size[1]/4)+90))
     pygame.display.flip()
     continuar = False
@@ -250,7 +247,10 @@ def PcontinuarG(puntaje,cliente): #Pantalla de final/Continuar
                     cliente.mi_socket.close()
                     screen = pygame.display.set_mode(players)
                     Pmenu()
-                if event.key == pygame.K_r:
+                """if event.key == pygame.K_r:
                     continuar=True
                     screen.fill((0,0,0))
+                    players = size
+                    screen = pygame.display.set_mode(players)
                     Pespera("nombre",cliente)
+                    """
