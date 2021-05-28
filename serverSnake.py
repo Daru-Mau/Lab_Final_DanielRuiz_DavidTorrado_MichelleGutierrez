@@ -34,7 +34,7 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
                         puntajes.append(dt)
                         if len(puntajes)==len(jugadoresOnline):
                             puntajes.sort()
-                            self.server.transmitir(f"ganador{puntajes[0]}".encode())
+                            self.server.transmitir(f"ganador{puntajes[0]}")
                     #elif "posicion" in dt:
                         #dato = self.conexion.recv(2048)
                         #datos = pickle.loads(dato)
@@ -43,7 +43,6 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
                         puntajes.clear()                           
                         self.conexion.close()
                         aceptando = True
-                        print("se aceptan mas jugadores")
                     else:
                         self.conexion.send(dt.encode())
                 else:
@@ -58,7 +57,6 @@ aceptando = True
 class Servidor(): #Crear e Iniciar Servidor
     def asigIPjugadores(self,ip):
         self.host = ip
-        print("casa")
     def iniciar(self):
         global jugadoresOnline
         self.zonasDisponibles =[[0,0],[300,0],[0,300],[300,300]]
@@ -91,7 +89,6 @@ class Servidor(): #Crear e Iniciar Servidor
                         self.esperandoJugadores = int(conexion.recv(2048).decode())
                     jugadoresOnline.append(conexion)
                     if len(jugadoresOnline)==self.esperandoJugadores:
-                        print("ya no se aceptan mas jugadores")
                         aceptando = False
                     hilo = Hilo_Partida(conexion,dir,self)
                     hilo.start()

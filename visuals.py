@@ -17,19 +17,18 @@ def puntos(): #posicion de la comida
     cantidad = 10 #cantidad de puntos que se generaran a la vez
     global food_pos
     global posInicio
-    print(posInicio)
     x = posInicio[0]+10
     y = posInicio[1]+10
     if len(food_pos) == 0:
-        for x in range(cantidad):
-            print(posInicio[0]+310)
-            random_posx = round(random.randrange(x,(x+300))//10)*10
-            random_posy = round(random.randrange(y,(y+300))//10)*10  
+        for pos in range(cantidad):
+            random_posx = round(random.randint(x,x+300)//10)*10
+            random_posy = round(random.randint(y,y+300)//10)*10 
+            print([random_posx,random_posy]) 
             food_pos.append([random_posx,random_posy])
     if len(food_pos)<cantidad:
         while len(food_pos)<cantidad:
-            random_posx = round(random.randrange(x,(x+300))//10)*10
-            random_posy = round(random.randrange(y,(y+300))//10)*10  
+            random_posx = round(random.randint(x,x+300)//10)*10
+            random_posy = round(random.randint(y,y+300)//10)*10  
             food_pos.append([random_posx,random_posy])
     return food_pos
 
@@ -185,17 +184,18 @@ def Pespera(texto,cliente): #Pantalla de espera
 
 def PcontinuarP(puntaje,cliente): #Pantalla de final/Continuar
     global screen
+    global posInicio
     screen.fill((0,0,0))
     limites()
-    score = font.render(str(f"Puntaje: {puntaje}"),0,(200,60,80))
+    score = font.render(str(f"Ganador: {puntaje}"),0,(200,60,80))
     text = font.render(str("---- Perdiste ----"),0,(200,60,80))
     op2 = font.render(str("R para revancha"),0,(200,60,80))
     op3 = font.render(str("Espacio para continuar"),0,(200,60,80))
     x = (size[0]/2 - text.get_width() // 2, size[1]/2 - text.get_height() // 2)
     screen.blit(text,(x[0],size[1]/4))
-    screen.blit(score,(x[0]-20,size[1]/4+30))
-    screen.blit(op2,(x[0]-20,size[1]/4+60))
-    screen.blit(op3,(x[0]-20,(size[1]/4)+90))
+    screen.blit(score,(posInicio[0]+x[0]-20,(posInicio[1]+size[1]/4)+30))
+    screen.blit(op2,(posInicio[0]+x[0]-20,(posInicio[1]+size[1]/4)+60))
+    screen.blit(op3,(posInicio[0]+x[0]-20,(posInicio[1]+size[1]/4)+90))
     pygame.display.flip()
     continuar = False
     while not continuar:
@@ -231,10 +231,10 @@ def PcontinuarG(puntaje,cliente): #Pantalla de final/Continuar
     op2 = font.render(str("R para revancha"),0,(200,60,80))
     op3 = font.render(str("Espacio para continuar"),0,(200,60,80))
     x = (size[0]/2 - text.get_width() // 2, size[1]/2 - text.get_height() // 2)
-    screen.blit(text,(x[0],size[1]/4))
-    screen.blit(score,(x[0]-20,size[1]/4+30))
-    screen.blit(op2,(x[0]-20,size[1]/4+60))
-    screen.blit(op3,(x[0]-20,(size[1]/4)+90))
+    screen.blit(text,(posInicio[0]+x[0],posInicio[1]+size[1]/4))
+    screen.blit(score,(posInicio[0]+x[0]-20,(posInicio[1]+size[1]/4)+30))
+    screen.blit(op2,(posInicio[0]+x[0]-20,(posInicio[1]+size[1]/4)+60))
+    screen.blit(op3,(posInicio[0]+x[0]-20,(posInicio[1]+size[1]/4)+90))
     pygame.display.flip()
     continuar = False
     while not continuar:

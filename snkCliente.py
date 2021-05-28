@@ -83,7 +83,6 @@ class Hilo_cliente(threading.Thread): #Hilo
             while "comenzar" not in instruccion:
                 data:str = self.socket.recv(2048)
                 instruccion = data.decode() 
-                print(instruccion)
                 accion_reaccion(instruccion)   
             self.comenzar = True          
             while True:
@@ -96,7 +95,7 @@ class Hilo_cliente(threading.Thread): #Hilo
                         if str(self.cliente.id) in instruccion:
                             accion_reaccion(f"ganaste{instruccion[13:]}")
                         else:
-                            accion_reaccion(f"perdiste{instruccion[13:]}")
+                            accion_reaccion(f"ganador{instruccion[13:]}")
                     else:
                         if str(self.cliente.id) in instruccion:                    
                             accion_reaccion(instruccion[2:])                
@@ -129,5 +128,4 @@ class Cliente(): #Cliente
 
     def enviar(self,instruccion):
         dt = str(f"{self.id}{instruccion}").encode()
-        print(dt)
         self.mi_socket.send(dt)
