@@ -27,6 +27,7 @@ class Snake(): #Juego
         food_pos = v.puntos()    
         score = 0
         instruccion = "RIGHT"
+        print(instruccion)
         cliente.enviar(instruccion)
         while run:        
             for event in pygame.event.get():

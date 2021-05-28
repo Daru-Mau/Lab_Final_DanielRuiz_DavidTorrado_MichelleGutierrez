@@ -21,13 +21,14 @@ def puntos(): #posicion de la comida
     y = posInicio[1]+10
     if len(food_pos) == 0:
         for x in range(cantidad):
-            random_posx = random.randint(x,((posInicio[0]+(size[0]-10))/10))*10
-            random_posy = random.randint(y,((posInicio[1]+(size[1]-10))/10))*10      
+            print(posInicio[0]+310)
+            random_posx = round(random.randrange(x,(x+300))//10)*10
+            random_posy = round(random.randrange(y,(y+300))//10)*10  
             food_pos.append([random_posx,random_posy])
     if len(food_pos)<cantidad:
         while len(food_pos)<cantidad:
-            random_posx = random.randint(x,((posInicio[0]+(size[0]-10))/10))*10
-            random_posy = random.randint(y,((posInicio[1]+(size[1]-10))/10))*10    
+            random_posx = round(random.randrange(x,(x+300))//10)*10
+            random_posy = round(random.randrange(y,(y+300))//10)*10  
             food_pos.append([random_posx,random_posy])
     return food_pos
 

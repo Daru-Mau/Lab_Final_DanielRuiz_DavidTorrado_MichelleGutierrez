@@ -1,4 +1,4 @@
-import socket, threading,pickle
+import socket, threading, pickle
 
 class Hilo_Partida(threading.Thread): #Hilo e instrucciones
     def __init__(self,conexion,dir,cliente):
@@ -43,6 +43,7 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
                 try:
                     dato = self.conexion.recv(2048)
                     dt = dato.decode()
+                    print(dt)
                     if(dt != ""):
                         if "score" in dt:
                             puntajes.append(dt)
@@ -74,11 +75,11 @@ class Servidor(): #Crear e Iniciar Servidor
         self.host = ip
     def iniciar(self):
         global jugadoresOnline
-        self.zonasDisponibles =[[0,0],[310,0],[0,310],[310,310]]
+        self.zonasDisponibles =[[0,0],[300,0],[0,300],[300,300]]
         self.coloresDisponibles =[[199,0,57],[27,227,106],[245,187,4],[32,229,16]]
         self.esperandoJugadores = 0
         hilos =[]
-        host="localhost" #Direccion con la que se iniciara el server
+        host="26.19.70.130" #Direccion con la que se iniciara el server
         """
         socket_server = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         socket_server.connect(("8.8.8.8", 80))

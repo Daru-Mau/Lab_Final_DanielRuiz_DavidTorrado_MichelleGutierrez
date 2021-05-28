@@ -83,7 +83,8 @@ class Hilo_cliente(threading.Thread): #Hilo
             while "comenzar" not in instruccion:
                 data = self.socket.recv(2048)
                 instruccion = data.decode() 
-                accion_reaccion(instruccion[2:])   
+                print(instruccion)
+                accion_reaccion(instruccion)   
             self.comenzar = True          
             while True:
                 data = self.socket.recv(2048)
@@ -102,7 +103,7 @@ class Hilo_cliente(threading.Thread): #Hilo
             print()
 
 class Cliente(): #Cliente
-    host="localhost" #Direccion en la que se conectara el cliente 
+    host="26.19.70.130" #Direccion en la que se conectara el cliente 
     def __init__(self):
         try:
             self.mi_socket = socket.socket()
@@ -127,4 +128,5 @@ class Cliente(): #Cliente
 
     def enviar(self,instruccion):
         dt = str(f"{self.id}{instruccion}").encode()
+        print(dt)
         self.mi_socket.send(dt)
