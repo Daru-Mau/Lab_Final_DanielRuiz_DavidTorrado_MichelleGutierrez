@@ -1,7 +1,7 @@
 import socket, threading, pickle
 
 class Hilo_Partida(threading.Thread): #Hilo e instrucciones
-    def __init__(self,conexion,dir,cliente):
+    def __init__(self,conexion,dir,server):
         """[summary]
         Args:
             conexion ([type]): [description]
@@ -9,13 +9,15 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
             cliente ([type]): [description]
         """
         threading.Thread.__init__(self)
+        global jugadoresOnline
         self.conexion = conexion        
         self.dir = dir
+        self.server = server
         self.jugadores = jugadoresOnline
         self.id = len(self.jugadores)
-        self.limite = cliente.esperandoJugadores
-        self.posIni = cliente.zonasDisponibles[len(self.jugadores)-1]
-        self.color = cliente.coloresDisponibles[len(self.jugadores)-1]
+        self.limite = server.esperandoJugadores
+        self.posIni = server.zonasDisponibles[len(self.jugadores)-1]
+        self.color = server.coloresDisponibles[len(self.jugadores)-1]
         self.conexion.send(pickle.dumps([self.posIni,self.color,f"j{self.id}"]))
     def run(self):
         """[summary]
@@ -32,7 +34,7 @@ class Hilo_Partida(threading.Thread): #Hilo e instrucciones
                         puntajes.append(dt)
                         if len(puntajes)==len(jugadoresOnline):
                             puntajes.sort()
-                            self.conexion.send(f"ganador{puntajes[0]}".encode())
+                            self.server.transmitir(f"ganador{puntajes[0]}".encode())
                     #elif "posicion" in dt:
                         #dato = self.conexion.recv(2048)
                         #datos = pickle.loads(dato)
@@ -95,7 +97,7 @@ class Servidor(): #Crear e Iniciar Servidor
                     hilo.start()
                     hilos.append(hilo)
                     if len(jugadoresOnline) < self.esperandoJugadores:
-                        self.transmitir(f"{self.esperandoJugadores-len(jugadoresOnline)}".encode())
+                        self.transmitir(f"{self.esperandoJugadores-len(jugadoresOnline)}")
                     elif len(jugadoresOnline) == self.esperandoJugadores:
                         self.transmitir("comenzar") 
             except Exception as e:

@@ -81,13 +81,13 @@ class Hilo_cliente(threading.Thread): #Hilo
             v.posInicio,v.rgb,self.cliente.id = pickle.loads(data)
             instruccion=""
             while "comenzar" not in instruccion:
-                data = self.socket.recv(2048)
+                data:str = self.socket.recv(2048)
                 instruccion = data.decode() 
                 print(instruccion)
                 accion_reaccion(instruccion)   
             self.comenzar = True          
             while True:
-                data = self.socket.recv(2048)
+                data:str = self.socket.recv(2048)
                 instruccion = data.decode()
                 print(instruccion)
                 if instruccion !="":

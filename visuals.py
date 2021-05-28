@@ -5,7 +5,7 @@ pygame.init()
 size = 310,310
 nJugadores=1
 players =0,0
-posInicio=0,0
+posInicio=[0,0]
 rgb = 0,0,0
 font = pygame.font.SysFont("comicsansms",20)
 screen = pygame.display.set_mode(size)
@@ -17,6 +17,7 @@ def puntos(): #posicion de la comida
     cantidad = 10 #cantidad de puntos que se generaran a la vez
     global food_pos
     global posInicio
+    print(posInicio)
     x = posInicio[0]+10
     y = posInicio[1]+10
     if len(food_pos) == 0:
